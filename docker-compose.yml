@@ -1,0 +1,56 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: 'nginx'
+    ports:
+      - '80:80'
+    volumes:
+      - ./public:/app/public:rw
+      - ./docker/nginx/nginx-development.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php-fpm
+
+  php-fpm:
+    build:
+        context: .
+        dockerfile: docker/php/Dockerfile
+    container_name: 'php-fpm'
+    working_dir: /app
+    environment:
+      APP_ENV: 'development'
+    volumes:
+      - ./:/app:rw
+
+  mysql:
+    image: mysql
+    container_name: 'mysql'
+    hostname: byteBuddy-api
+    environment:
+      MYSQL_DATABASE: 'byteBuddy_api'
+      MYSQL_USER: 'testing'
+      MYSQL_PASSWORD: '1234'
+      MYSQL_ROOT_PASSWORD: '1234'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - byteBuddyData:/var/lib/mysql:rw
+      - ./data/mysql:/docker-entrypoint-initdb.d/:ro
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: 'pma'
+    links:
+      - mysql
+    environment:
+      PMA_HOST: byteBuddy-api
+      PMA_PORT: 3306
+      PMA_ARBITRAY: 1
+    ports:
+      - '8081:80'
+
+volumes:
+  byteBuddyData:
