@@ -35,6 +35,23 @@ class BirthdayRepository
         return BirthdayObject::from($guildId, $userId, $stmt->fetchColumn());
     }
 
+    public function getAllBirthdays(int $guildId): array|false
+    {
+        $sql = "SELECT user_id, birthday FROM birthday_data WHERE guild_id = :guildId";
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['guildId' => $guildId]);
+
+            if ($stmt->rowCount() > 0)
+                return $stmt->fetchAll();
+        } catch (PDOException) {
+            throw new ByteBuddyDatabaseException('Failed to fetch birthday data', 500);
+        }
+
+        return false;
+    }
+
     /**
      * @throws ByteBuddyDatabaseException
      */
