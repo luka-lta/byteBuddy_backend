@@ -11,7 +11,6 @@ use Slim\Routing\RouteCollectorProxy;
 
 class Routes
 {
-    // TODO: Test birthday
     public static function getRoutes(App $app): void
     {
         $app->group('/api/v1', function (RouteCollectorProxy $group) {

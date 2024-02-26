@@ -1,8 +1,9 @@
 CREATE TABLE `channel_data`
 (
-    `guild_id`           bigint NOT NULL,
-    `welcome_channel_id` bigint DEFAULT NULL,
-    `leave_channel_id`   bigint DEFAULT NULL
+    `guild_id`            bigint NOT NULL,
+    `welcome_channel_id`  bigint DEFAULT NULL,
+    `leave_channel_id`    bigint DEFAULT NULL,
+    `birthday_channel_id` bigint DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
