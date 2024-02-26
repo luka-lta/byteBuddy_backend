@@ -11,7 +11,9 @@ use PDOException;
 
 class ChannelConfigRepository
 {
-    public function __construct(private readonly PDO $pdo) {}
+    public function __construct(private readonly PDO $pdo)
+    {
+    }
 
     /**
      * @throws ByteBuddyDatabaseException
@@ -29,7 +31,9 @@ class ChannelConfigRepository
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['guildId' => $guildId]);
 
-            return Channel::from($stmt->fetch());
+            $result = $stmt->fetch()[$columnName];
+
+            return Channel::from($result);
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch channel data', 500);
         }
@@ -85,7 +89,7 @@ class ChannelConfigRepository
      */
     private function validateChannelType(string $channelType): void
     {
-        if (!in_array($channelType, ['welcome', 'leave'])) {
+        if (!in_array($channelType, ['welcome', 'leave', 'birthday'])) {
             throw new ByteBuddyInvalidChannelException('Invalid channel type');
         }
     }

@@ -25,13 +25,15 @@ class ChannelConfigService
         try {
             $welcomeChannel = $this->channelConfigRepository->getChannel($guildId, 'welcome');
             $leaveChannel = $this->channelConfigRepository->getChannel($guildId, 'leave');
+            $birthdayChannel = $this->channelConfigRepository->getChannel($guildId, 'birthday');
 
             return ResultObject::from(
                 true,
                 'Channels fetched successfully',
                 [
                     'welcomeChannel' => $welcomeChannel->getChannelId(),
-                    'leaveChannel' => $leaveChannel->getChannelId()
+                    'leaveChannel' => $leaveChannel->getChannelId(),
+                    'birthdayChannel' => $birthdayChannel->getChannelId(),
                 ],
                 200
             );
