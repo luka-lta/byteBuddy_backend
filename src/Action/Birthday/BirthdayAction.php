@@ -18,7 +18,7 @@ class BirthdayAction
 
     public function handleGetBirthdaysFromGuildAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $guildId = $request->getQueryParams()['guildId'];
+        $guildId = (int)$request->getQueryParams()['guildId'] ?? null;
         $result = $this->birthdayService->getBirthdays($guildId);
         $response->getBody()->write($result->getResponseAsJson());
 
@@ -33,9 +33,9 @@ class BirthdayAction
 
     public function handleSetOrUpdateBirthdaysAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $guildId = $request->getQueryParams()['guildId'];
+        $guildId = (int)$request->getQueryParams()['guildId'] ?? null;
         $parsedBody = $request->getParsedBody();
-        $birthdayDate = DateTime::createFromFormat('Y-m-d', $parsedBody['birthdayDate']);
+        $birthdayDate = DateTime::createFromFormat('Y.m.d', $parsedBody['birthdayDate']);
         $result = $this->birthdayService->setOrUpdateBirthday($guildId, $parsedBody['userId'], $birthdayDate);
         $response->getBody()->write($result->getResponseAsJson());
 
