@@ -8,6 +8,7 @@ use ByteBuddyApi\Repository\BirthdayRepository;
 use ByteBuddyApi\Value\BirthdayObject;
 use ByteBuddyApi\Value\ResultObject;
 use DateTime;
+use Exception;
 
 class BirthdayService
 {
@@ -32,6 +33,8 @@ class BirthdayService
             return ResultObject::from(true, 'Birthdays found', $birthdays, 200);
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+        } catch (Exception) {
+            return ResultObject::from(false, 'An error occurred', null, 500);
         }
     }
 
@@ -55,6 +58,8 @@ class BirthdayService
             return ResultObject::from(true, 'Birthday set successfully', null, 200);
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+        } catch (Exception) {
+            return ResultObject::from(false, 'An error occurred', null, 500);
         }
     }
 }

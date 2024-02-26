@@ -6,6 +6,7 @@ namespace ByteBuddyApi\Service;
 use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\ConfigRepository;
 use ByteBuddyApi\Value\ResultObject;
+use Exception;
 
 class ConfigService
 {
@@ -29,6 +30,8 @@ class ConfigService
             $this->configRepository->registerNewGuild($guildId, $serverName);
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+        } catch (Exception) {
+            return ResultObject::from(false, 'An error occurred', null, 500);
         }
 
         return ResultObject::from(
@@ -49,6 +52,8 @@ class ConfigService
             $configData = $this->configRepository->getConfigData($guildId);
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+        } catch (Exception) {
+            return ResultObject::from(false, 'An error occurred', null, 500);
         }
 
         return ResultObject::from(
@@ -73,6 +78,8 @@ class ConfigService
             }
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+        } catch (Exception) {
+            return ResultObject::from(false, 'An error occurred', null, 500);
         }
 
         return ResultObject::from(true, 'Config data updated successfully', null, 200);

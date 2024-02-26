@@ -7,6 +7,7 @@ use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\ChannelConfigRepository;
 use ByteBuddyApi\Value\Channel;
 use ByteBuddyApi\Value\ResultObject;
+use Exception;
 
 class ChannelConfigService
 {
@@ -40,6 +41,8 @@ class ChannelConfigService
 
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+        } catch (Exception) {
+            return ResultObject::from(false, 'An error occurred', null, 500);
         }
     }
 
@@ -58,6 +61,8 @@ class ChannelConfigService
             $this->channelConfigRepository->setChannel($guildId, $channel, $channelType);
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+        } catch (Exception) {
+            return ResultObject::from(false, 'An error occurred', null, 500);
         }
 
         return ResultObject::from(true, 'Channel updated successfully', null, 200);
