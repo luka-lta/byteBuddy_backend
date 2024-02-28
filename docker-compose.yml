@@ -16,6 +16,7 @@ services:
     build:
         context: .
         dockerfile: docker/php/Dockerfile
+        target: development
     container_name: 'php-fpm'
     working_dir: /app
     environment:

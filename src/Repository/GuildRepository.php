@@ -77,8 +77,7 @@ class GuildRepository
             }
 
             return false;
-        } catch (PDOException $exception) {
-            var_dump($exception->getMessage());
+        } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch config data', 500);
         }
     }
