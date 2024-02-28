@@ -38,7 +38,7 @@ class BirthdayService
         }
     }
 
-    public function setOrUpdateBirthday(int|null $guildId, int|null $userId, DateTime|null $birthdayDate): ResultObject
+    public function setOrUpdateBirthday(int|null $guildId, string|null $userId, DateTime|null $birthdayDate): ResultObject
     {
         if ($guildId == null) {
             return ResultObject::from(false, 'GuildId must be set', null, 400);

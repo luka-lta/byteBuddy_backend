@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Action\Config;
 
-use ByteBuddyApi\Service\ConfigService;
+use ByteBuddyApi\Service\GuildService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ConfigAction
+class GuildAction
 {
     public function __construct(
-        private readonly ConfigService $configService
+        private readonly GuildService $configService
     ) {}
 
     public function handleRegisterGuild(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface

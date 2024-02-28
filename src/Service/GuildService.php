@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Service;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
-use ByteBuddyApi\Repository\ConfigRepository;
+use ByteBuddyApi\Repository\GuildRepository;
 use ByteBuddyApi\Value\ResultObject;
 use Exception;
 
-class ConfigService
+class GuildService
 {
     public function __construct(
-        private readonly ConfigRepository $configRepository
+        private readonly GuildRepository $configRepository
     )
     {
     }

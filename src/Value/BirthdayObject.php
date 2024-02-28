@@ -9,13 +9,13 @@ final class BirthdayObject
 {
     private function __construct(
         private readonly int $guildId,
-        private readonly int $userId,
+        private readonly string $userId,
         private readonly DateTime $birthday
     )
     {
     }
 
-    public static function from(int $guildId, int $userId, DateTime $birthday): self
+    public static function from(int $guildId, string $userId, DateTime $birthday): self
     {
         return new self($guildId, $userId, $birthday);
     }
@@ -25,7 +25,7 @@ final class BirthdayObject
         return [
             'guildId' => $this->guildId,
             'userId' => $this->userId,
-            'birthday' => $this->birthday->format('Y-m-d')
+            'birthday' => $this->birthday->format('d.m.Y')
         ];
     }
 
@@ -34,7 +34,7 @@ final class BirthdayObject
         return $this->guildId;
     }
 
-    public function getUserId(): int
+    public function getUserId(): string
     {
         return $this->userId;
     }

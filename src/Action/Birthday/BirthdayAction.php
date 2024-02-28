@@ -35,7 +35,7 @@ class BirthdayAction
     {
         $guildId = (int)$request->getQueryParams()['guildId'] ?? null;
         $parsedBody = $request->getParsedBody();
-        $birthdayDate = DateTime::createFromFormat('Y.m.d', $parsedBody['birthdayDate']);
+        $birthdayDate = DateTime::createFromFormat('d.m.Y', $parsedBody['birthdayDate']);
         $result = $this->birthdayService->setOrUpdateBirthday($guildId, $parsedBody['userId'], $birthdayDate);
         $response->getBody()->write($result->getResponseAsJson());
 

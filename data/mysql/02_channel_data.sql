@@ -12,4 +12,4 @@ ALTER TABLE `channel_data`
     ADD KEY `guild_id` (`guild_id`);
 
 ALTER TABLE `channel_data`
-    ADD CONSTRAINT `GuildId` FOREIGN KEY (`guild_id`) REFERENCES `config_data` (`guild_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `GuildId` FOREIGN KEY (`guild_id`) REFERENCES `guild_data` (`guild_id`) ON DELETE CASCADE ON UPDATE CASCADE;
