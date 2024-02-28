@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Action\Birthday;
 
+use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Service\BirthdayService;
-use DateTime;
+use ByteBuddyApi\Value\ResultObject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class BirthdayAction
+class BirthdayAction extends ByteBuddyAction
 {
     public function __construct(
         private readonly BirthdayService $birthdayService,
@@ -18,33 +19,44 @@ class BirthdayAction
 
     public function handleGetBirthdaysFromGuildAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $guildId = (int)$request->getQueryParams()['guildId'] ?? null;
+        $guildId = $request->getQueryParams()['guildId'] ?? null;
+
+        if (!$guildId) {
+            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            return $this->buildResponse($response, $result);
+        }
+
         $result = $this->birthdayService->getBirthdays($guildId);
         $response->getBody()->write($result->getResponseAsJson());
 
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', '*')
-            ->withHeader('Access-Control-Max-Age', '86400')
-            ->withStatus($result->getStatusCode());
+        return $this->buildResponse($response, $result);
     }
 
     public function handleSetOrUpdateBirthdaysAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $guildId = (int)$request->getQueryParams()['guildId'] ?? null;
         $parsedBody = $request->getParsedBody();
-        $birthdayDate = DateTime::createFromFormat('d.m.Y', $parsedBody['birthdayDate']);
-        $result = $this->birthdayService->setOrUpdateBirthday($guildId, $parsedBody['userId'], $birthdayDate);
+        $guildId = $request->getQueryParams()['guildId'] ?? null;
+        $birthdayString = $parsedBody['birthdayDate'] ?? null;
+        $userId = $parsedBody['userId'] ?? null;
+
+        if (!$guildId) {
+            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            return $this->buildResponse($response, $result);
+        }
+
+        if (!$userId) {
+            $result = ResultObject::from(false, 'User ID is required', null, 400);
+            return $this->buildResponse($response, $result);
+        }
+
+        if (!$birthdayString) {
+            $result = ResultObject::from(false, 'Birthday date is required', null, 400);
+            return $this->buildResponse($response, $result);
+        }
+
+        $result = $this->birthdayService->setOrUpdateBirthday($guildId, $parsedBody['userId'], $parsedBody['birthdayDate']);
         $response->getBody()->write($result->getResponseAsJson());
 
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', '*')
-            ->withHeader('Access-Control-Max-Age', '86400')
-            ->withStatus($result->getStatusCode());
+        return $this->buildResponse($response, $result);
     }
 }

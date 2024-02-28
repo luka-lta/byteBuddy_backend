@@ -19,7 +19,7 @@ class ChannelConfigRepository
      * @throws ByteBuddyDatabaseException
      * @throws ByteBuddyInvalidChannelException
      */
-    public function getChannel(int $guildId, string $channelType): Channel
+    public function getChannel(string $guildId, string $channelType): Channel
     {
         $this->validateChannelType($channelType);
 
@@ -43,7 +43,7 @@ class ChannelConfigRepository
      * @throws ByteBuddyDatabaseException
      * @throws ByteBuddyInvalidChannelException
      */
-    public function setChannel(int $guildId, Channel $channel, string $channelType): void
+    public function setChannel(string $guildId, Channel $channel, string $channelType): void
     {
         $this->validateChannelType($channelType);
 
@@ -66,7 +66,7 @@ class ChannelConfigRepository
         }
     }
 
-    private function guildExists(int $guildId): bool
+    private function guildExists(string $guildId): bool
     {
         $sql = "SELECT guild_id FROM channel_data WHERE guild_id = :guildId";
 
@@ -76,7 +76,7 @@ class ChannelConfigRepository
         return $stmt->fetch() !== false;
     }
 
-    public function createGuild(int $guildId): void
+    public function createGuild(string $guildId): void
     {
         $sql = "INSERT INTO channel_data (guild_id) VALUES (:guildId)";
 

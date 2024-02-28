@@ -8,14 +8,14 @@ use DateTime;
 final class BirthdayObject
 {
     private function __construct(
-        private readonly int $guildId,
+        private readonly string $guildId,
         private readonly string $userId,
         private readonly DateTime $birthday
     )
     {
     }
 
-    public static function from(int $guildId, string $userId, DateTime $birthday): self
+    public static function from(string $guildId, string $userId, DateTime $birthday): self
     {
         return new self($guildId, $userId, $birthday);
     }
@@ -29,7 +29,7 @@ final class BirthdayObject
         ];
     }
 
-    public function getGuildId(): int
+    public function getGuildId(): string
     {
         return $this->guildId;
     }

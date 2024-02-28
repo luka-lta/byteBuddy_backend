@@ -5,7 +5,7 @@ namespace ByteBuddyApi\Route;
 
 use ByteBuddyApi\Action\Birthday\BirthdayAction;
 use ByteBuddyApi\Action\Channel\ChannelConfigAction;
-use ByteBuddyApi\Action\Config\GuildAction;
+use ByteBuddyApi\Action\Guild\GuildAction;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 

@@ -18,12 +18,8 @@ class BirthdayService
     {
     }
 
-    public function getBirthdays(int $guildId): ResultObject
+    public function getBirthdays(string $guildId): ResultObject
     {
-        if ($guildId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
         try {
             $birthdays = $this->birthdayRepository->getAllBirthdays($guildId);
             if (!$birthdays) {
@@ -38,23 +34,13 @@ class BirthdayService
         }
     }
 
-    public function setOrUpdateBirthday(int|null $guildId, string|null $userId, DateTime|null $birthdayDate): ResultObject
+    public function setOrUpdateBirthday(string $guildId, string $userId, string $birthdayDate): ResultObject
     {
-        if ($guildId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
-        if ($userId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
-        if ($birthdayDate == null) {
-            return ResultObject::from(false, 'Birthday date must be set', null, 400);
-        }
-
         try {
+            $birthdayDate = DateTime::createFromFormat('d.m.Y', $birthdayDate);
             $birthdayObject = BirthdayObject::from($guildId, $userId, $birthdayDate);
             $this->birthdayRepository->setOrUpdateBirthday($birthdayObject);
+
             return ResultObject::from(true, 'Birthday set successfully', null, 200);
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());

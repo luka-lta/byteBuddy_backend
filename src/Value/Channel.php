@@ -6,11 +6,11 @@ namespace ByteBuddyApi\Value;
 final class Channel
 {
     private function __construct(
-        private readonly int $channelId,
+        private readonly string $channelId,
     ) {}
 
     public static function from(
-        int $channelId
+        string $channelId
     ): self {
         return new self($channelId);
     }
@@ -30,7 +30,7 @@ final class Channel
         ];
     }
 
-    public function getChannelId(): int
+    public function getChannelId(): string
     {
         return $this->channelId;
     }

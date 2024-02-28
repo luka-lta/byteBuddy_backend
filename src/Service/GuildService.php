@@ -18,16 +18,8 @@ class GuildService
     {
     }
 
-    public function registerGuild(int|null $guildId, string $serverName): ResultObject
+    public function registerGuild(string $guildId, string $serverName): ResultObject
     {
-        if ($guildId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
-        if ($serverName == null) {
-            return ResultObject::from(false, 'Servername must be set', null, 400);
-        }
-
         try {
             $this->configRepository->registerNewGuild($guildId, $serverName);
         } catch (ByteBuddyException $e) {
@@ -44,13 +36,8 @@ class GuildService
         );
     }
 
-    public function getConfigData(int|null $guildId): ResultObject
+    public function getConfigData(string $guildId): ResultObject
     {
-        if ($guildId == null) {
-            $this->logger->error('GuildId must be set');
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
         try {
             $configData = $this->configRepository->getConfigData($guildId);
         } catch (ByteBuddyException $e) {
@@ -67,12 +54,8 @@ class GuildService
         );
     }
 
-    public function setConfigValue(int|null $guildId, array $changedValues): ResultObject
+    public function setConfigValue(string $guildId, array $changedValues): ResultObject
     {
-        if ($guildId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
         try {
             foreach ($changedValues as $key => $value) {
                 if (!$this->configRepository->setConfigKey($guildId, $key, $value)) {

@@ -1,8 +1,8 @@
 CREATE TABLE `birthday_data`
 (
-    `guild_id` bigint    NOT NULL,
-    `user_id`  char(200) NOT NULL,
-    `birthday` date      NOT NULL
+    `guild_id` varchar(200) NOT NULL,
+    `user_id`  char(200)    NOT NULL,
+    `birthday` date         NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;

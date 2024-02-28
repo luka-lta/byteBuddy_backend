@@ -17,12 +17,8 @@ class ChannelConfigService
     {
     }
 
-    public function getAllChannels(int|null $guildId): ResultObject
+    public function getAllChannels(string $guildId): ResultObject
     {
-        if ($guildId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
         try {
             $welcomeChannel = $this->channelConfigRepository->getChannel($guildId, 'welcome');
             $leaveChannel = $this->channelConfigRepository->getChannel($guildId, 'leave');
@@ -46,7 +42,7 @@ class ChannelConfigService
         }
     }
 
-    public function setChannel(int|null $guildId, string|null $channelType, int $channelId): ResultObject
+    public function setChannel(string $guildId, string $channelType, string $channelId): ResultObject
     {
         if ($guildId == null) {
             return ResultObject::from(false, 'GuildId must be set', null, 400);
