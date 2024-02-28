@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Value\Config;
 
-final class ConfigObject
+final class GuildObject
 {
     private function __construct(
         private readonly int $guildId,

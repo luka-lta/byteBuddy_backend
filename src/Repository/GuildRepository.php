@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
-use ByteBuddyApi\Value\Config\ConfigObject;
+use ByteBuddyApi\Value\Config\GuildObject;
 use PDO;
 use PDOException;
 
-class ConfigRepository
+class GuildRepository
 {
     public function __construct(
         private readonly PDO $pdo
@@ -22,7 +22,7 @@ class ConfigRepository
     public function registerNewGuild(int $guildId, string $serverName): bool
     {
         $sql = <<<SQL
-            INSERT INTO config_data (guild_id, server_name) VALUES (:guildId, :serverId)
+            INSERT INTO guild_data (guild_id, server_name) VALUES (:guildId, :serverId)
         SQL;
 
         try {
@@ -39,10 +39,10 @@ class ConfigRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getConfigData(int $guildId): ConfigObject
+    public function getConfigData(int $guildId): GuildObject
     {
         $sql = <<<SQL
-            SELECT * FROM config_data WHERE guild_id = $guildId
+            SELECT * FROM guild_data WHERE guild_id = $guildId
         SQL;
 
         try {
@@ -54,7 +54,7 @@ class ConfigRepository
             throw new ByteBuddyDatabaseException('Failed to fetch config data', 500);
         }
 
-        return ConfigObject::fromDatabase($result);
+        return GuildObject::fromDatabase($result);
     }
 
     /**
@@ -63,7 +63,7 @@ class ConfigRepository
     public function setConfigKey(int $guildId, string $row, string $value): bool
     {
         $sql = <<<SQL
-            UPDATE config_data
+            UPDATE guild_data
             SET $row = :value WHERE guild_id = :guildId
         SQL;
         try {
@@ -77,8 +77,7 @@ class ConfigRepository
             }
 
             return false;
-        } catch (PDOException $exception) {
-            var_dump($exception->getMessage());
+        } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch config data', 500);
         }
     }

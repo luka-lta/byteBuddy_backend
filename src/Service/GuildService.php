@@ -4,14 +4,16 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Service;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
-use ByteBuddyApi\Repository\ConfigRepository;
+use ByteBuddyApi\Repository\GuildRepository;
 use ByteBuddyApi\Value\ResultObject;
 use Exception;
+use Monolog\Logger;
 
-class ConfigService
+class GuildService
 {
     public function __construct(
-        private readonly ConfigRepository $configRepository
+        private readonly GuildRepository $configRepository,
+        private readonly Logger $logger,
     )
     {
     }
@@ -45,6 +47,7 @@ class ConfigService
     public function getConfigData(int|null $guildId): ResultObject
     {
         if ($guildId == null) {
+            $this->logger->error('GuildId must be set');
             return ResultObject::from(false, 'GuildId must be set', null, 400);
         }
 

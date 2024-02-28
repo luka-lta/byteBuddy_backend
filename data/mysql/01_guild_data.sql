@@ -1,4 +1,4 @@
-CREATE TABLE `config_data`
+CREATE TABLE guild_data
 (
     `guild_id`    bigint       NOT NULL,
     `server_name` varchar(200) NOT NULL,
@@ -7,5 +7,5 @@ CREATE TABLE `config_data`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
-ALTER TABLE `config_data`
+ALTER TABLE guild_data
     ADD PRIMARY KEY (`guild_id`);

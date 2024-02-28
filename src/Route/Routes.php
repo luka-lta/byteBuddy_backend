@@ -5,7 +5,7 @@ namespace ByteBuddyApi\Route;
 
 use ByteBuddyApi\Action\Birthday\BirthdayAction;
 use ByteBuddyApi\Action\Channel\ChannelConfigAction;
-use ByteBuddyApi\Action\Config\ConfigAction;
+use ByteBuddyApi\Action\Config\GuildAction;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
@@ -14,10 +14,10 @@ class Routes
     public static function getRoutes(App $app): void
     {
         $app->group('/api/v1', function (RouteCollectorProxy $group) {
-            $group->post('/register', [ConfigAction::class, 'handleRegisterGuild']);
+            $group->post('/register', [GuildAction::class, 'handleRegisterGuild']);
 
-            $group->get('/config', [ConfigAction::class, 'handleGetConfigAction']);
-            $group->post('/config', [ConfigAction::class, 'handleSetConfigData']);
+            $group->get('/guild', [GuildAction::class, 'handleGetConfigAction']);
+            $group->post('/guild', [GuildAction::class, 'handleSetConfigData']);
 
             $group->post('/channels', [ChannelConfigAction::class, 'handleSetChannels']);
             $group->get('/channels', [ChannelConfigAction::class, 'handleGetChannels']);
