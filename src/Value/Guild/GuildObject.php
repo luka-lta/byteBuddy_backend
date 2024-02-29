@@ -37,7 +37,7 @@ final class GuildObject
         return [
             'guildId' => $this->guildId,
             'serverName' => $this->severName,
-            'themeColor' => $this->themeColor,
+            'themeColor' => '#' . $this->themeColor,
         ];
     }
 
