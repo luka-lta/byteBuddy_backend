@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace ByteBuddyApi\Value\Config;
+namespace ByteBuddyApi\Value\Guild;
 
 final class GuildObject
 {
     private function __construct(
-        private readonly int $guildId,
+        private readonly string $guildId,
         private readonly string $severName,
         private readonly string $themeColor,
     ) {}
 
     public static function from(
-        int $guildId,
+        string $guildId,
         string $severName,
         string $themeColor,
     ): self {
@@ -41,7 +41,7 @@ final class GuildObject
         ];
     }
 
-    public function getGuildId(): int
+    public function getGuildId(): string
     {
         return $this->guildId;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
-use ByteBuddyApi\Value\Config\GuildObject;
+use ByteBuddyApi\Value\Guild\GuildObject;
 use PDO;
 use PDOException;
 
@@ -19,7 +19,7 @@ class GuildRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function registerNewGuild(int $guildId, string $serverName): bool
+    public function registerNewGuild(string $guildId, string $serverName): bool
     {
         $sql = <<<SQL
             INSERT INTO guild_data (guild_id, server_name) VALUES (:guildId, :serverId)
@@ -39,7 +39,7 @@ class GuildRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getConfigData(int $guildId): GuildObject
+    public function getConfigData(string $guildId): GuildObject
     {
         $sql = <<<SQL
             SELECT * FROM guild_data WHERE guild_id = $guildId
@@ -60,7 +60,7 @@ class GuildRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function setConfigKey(int $guildId, string $row, string $value): bool
+    public function setConfigKey(string $guildId, string $row, string $value): bool
     {
         $sql = <<<SQL
             UPDATE guild_data

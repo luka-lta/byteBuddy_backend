@@ -19,7 +19,7 @@ class BirthdayRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getBirthday(int $guildId, int $userId): BirthdayObject
+    public function getBirthday(string $guildId, string $userId): BirthdayObject
     {
         $sql = "SELECT birthday FROM birthday_data WHERE guild_id = :guildId AND user_id = :userId";
         try {
@@ -35,7 +35,7 @@ class BirthdayRepository
         return BirthdayObject::from($guildId, $userId, $stmt->fetchColumn());
     }
 
-    public function getAllBirthdays(int $guildId): array|false
+    public function getAllBirthdays(string $guildId): array|false
     {
         $sql = "SELECT user_id, birthday FROM birthday_data WHERE guild_id = :guildId";
 
@@ -82,7 +82,7 @@ class BirthdayRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function birthdayExists(int $guildId, int $userId): bool
+    public function birthdayExists(string $guildId, string $userId): bool
     {
         $sql = "SELECT COUNT(*) FROM birthday_data WHERE guild_id = :guildId AND user_id = :userId";
 

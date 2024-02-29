@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Action\Channel;
 
+use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Service\ChannelConfigService;
+use ByteBuddyApi\Value\ResultObject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ChannelConfigAction
+class ChannelConfigAction extends ByteBuddyAction
 {
     public function __construct(
         private readonly ChannelConfigService $channelConfigService
@@ -15,37 +17,41 @@ class ChannelConfigAction
     {
     }
 
-
     public function handleGetChannels(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $guildId = (int)$request->getQueryParams()['guildId'] ?? null;
-        $result = $this->channelConfigService->getAllChannels($guildId);
+        $guildId = $request->getQueryParams()['guildId'] ?? null;
+        $channelType = $request->getQueryParams()['channelType'] ?? null;
+
+        if (!$guildId) {
+            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            return $this->buildResponse($response, $result);
+        }
+
+        $result = $this->channelConfigService->getAllChannelsOrSpecific($guildId, $channelType);
         $response->getBody()->write($result->getResponseAsJson());
 
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', '*')
-            ->withHeader('Access-Control-Max-Age', '86400')
-            ->withStatus($result->getStatusCode());
+        return $this->buildResponse($response, $result);
     }
 
     public function handleSetChannels(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $guildId = (int)$request->getQueryParams()['guildId'] ?? null;
+        $guildId = $request->getQueryParams()['guildId'] ?? null;
         $channelType = $request->getQueryParams()['channelType'] ?? null;
         $parsedBody = $request->getParsedBody();
+
+        if (!$guildId) {
+            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            return $this->buildResponse($response, $result);
+        }
+
+        if (!$channelType) {
+            $result = ResultObject::from(false, 'Channel type is required', null, 400);
+            return $this->buildResponse($response, $result);
+        }
 
         $result = $this->channelConfigService->setChannel($guildId, $channelType, $parsedBody['channelId']);
         $response->getBody()->write($result->getResponseAsJson());
 
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', '*')
-            ->withHeader('Access-Control-Max-Age', '86400')
-            ->withStatus($result->getStatusCode());
+        return $this->buildResponse($response, $result);
     }
 }

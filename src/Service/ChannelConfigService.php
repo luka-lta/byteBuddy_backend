@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Service;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
+use ByteBuddyApi\Exception\ByteBuddyInvalidChannelException;
 use ByteBuddyApi\Repository\ChannelConfigRepository;
 use ByteBuddyApi\Value\Channel;
 use ByteBuddyApi\Value\ResultObject;
@@ -17,25 +18,31 @@ class ChannelConfigService
     {
     }
 
-    public function getAllChannels(int|null $guildId): ResultObject
+    public function getAllChannelsOrSpecific(string $guildId, string|null $channelType): ResultObject
     {
-        if ($guildId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
-        }
-
         try {
-            $welcomeChannel = $this->channelConfigRepository->getChannel($guildId, 'welcome');
-            $leaveChannel = $this->channelConfigRepository->getChannel($guildId, 'leave');
-            $birthdayChannel = $this->channelConfigRepository->getChannel($guildId, 'birthday');
+            if ($channelType) {
+                $channel = $this->channelConfigRepository->getChannel($guildId, $channelType);
+                return ResultObject::from(
+                    true,
+                    'Channel fetched successfully',
+                    $channel->asArray(),
+                    200
+                );
+            }
+
+            $channels = $this->channelConfigRepository->getAllChannels($guildId);
+
+            $channelArray = [];
+            /** @var Channel $channel */
+            foreach ($channels as $channel) {
+                $channelArray[] = $channel->asArray();
+            }
 
             return ResultObject::from(
                 true,
                 'Channels fetched successfully',
-                [
-                    'welcomeChannel' => $welcomeChannel->getChannelId(),
-                    'leaveChannel' => $leaveChannel->getChannelId(),
-                    'birthdayChannel' => $birthdayChannel->getChannelId(),
-                ],
+                $channelArray,
                 200
             );
 
@@ -46,7 +53,7 @@ class ChannelConfigService
         }
     }
 
-    public function setChannel(int|null $guildId, string|null $channelType, int $channelId): ResultObject
+    public function setChannel(string $guildId, string $channelType, string $channelId): ResultObject
     {
         if ($guildId == null) {
             return ResultObject::from(false, 'GuildId must be set', null, 400);
@@ -56,8 +63,8 @@ class ChannelConfigService
             return ResultObject::from(false, 'Channel type must be set', null, 400);
         }
 
-        $channel = Channel::from($channelId);
         try {
+            $channel = Channel::from($channelId, $channelType);
             $this->channelConfigRepository->setChannel($guildId, $channel, $channelType);
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());

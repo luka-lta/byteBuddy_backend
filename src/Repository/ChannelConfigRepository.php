@@ -5,6 +5,7 @@ namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Exception\ByteBuddyInvalidChannelException;
+use ByteBuddyApi\Type\ChannelTypes;
 use ByteBuddyApi\Value\Channel;
 use PDO;
 use PDOException;
@@ -16,10 +17,27 @@ class ChannelConfigRepository
     }
 
     /**
+     * @throws ByteBuddyInvalidChannelException
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getAllChannels(string $guildId): array
+    {
+        $channelTypes = ChannelTypes::getAllChannelTypes();
+
+        $channels = [];
+
+        foreach ($channelTypes as $channelType) {
+            $channels[] = $this->getChannel($guildId, $channelType);
+        }
+
+        return $channels;
+    }
+
+    /**
      * @throws ByteBuddyDatabaseException
      * @throws ByteBuddyInvalidChannelException
      */
-    public function getChannel(int $guildId, string $channelType): Channel
+    public function getChannel(string $guildId, string $channelType): Channel
     {
         $this->validateChannelType($channelType);
 
@@ -33,7 +51,7 @@ class ChannelConfigRepository
 
             $result = $stmt->fetch()[$columnName];
 
-            return Channel::from($result);
+            return Channel::from($result, $channelType);
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch channel data', 500);
         }
@@ -43,7 +61,7 @@ class ChannelConfigRepository
      * @throws ByteBuddyDatabaseException
      * @throws ByteBuddyInvalidChannelException
      */
-    public function setChannel(int $guildId, Channel $channel, string $channelType): void
+    public function setChannel(string $guildId, Channel $channel, string $channelType): void
     {
         $this->validateChannelType($channelType);
 
@@ -66,7 +84,7 @@ class ChannelConfigRepository
         }
     }
 
-    private function guildExists(int $guildId): bool
+    private function guildExists(string $guildId): bool
     {
         $sql = "SELECT guild_id FROM channel_data WHERE guild_id = :guildId";
 
@@ -76,7 +94,7 @@ class ChannelConfigRepository
         return $stmt->fetch() !== false;
     }
 
-    public function createGuild(int $guildId): void
+    public function createGuild(string $guildId): void
     {
         $sql = "INSERT INTO channel_data (guild_id) VALUES (:guildId)";
 
