@@ -20,13 +20,14 @@ class ChannelConfigAction extends ByteBuddyAction
     public function handleGetChannels(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $guildId = $request->getQueryParams()['guildId'] ?? null;
+        $channelType = $request->getQueryParams()['channelType'] ?? null;
 
         if (!$guildId) {
             $result = ResultObject::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
-        $result = $this->channelConfigService->getAllChannels($guildId);
+        $result = $this->channelConfigService->getAllChannelsOrSpecific($guildId, $channelType);
         $response->getBody()->write($result->getResponseAsJson());
 
         return $this->buildResponse($response, $result);

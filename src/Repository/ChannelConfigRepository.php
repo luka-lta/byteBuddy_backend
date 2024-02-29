@@ -5,6 +5,7 @@ namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Exception\ByteBuddyInvalidChannelException;
+use ByteBuddyApi\Type\ChannelTypes;
 use ByteBuddyApi\Value\Channel;
 use PDO;
 use PDOException;
@@ -13,6 +14,23 @@ class ChannelConfigRepository
 {
     public function __construct(private readonly PDO $pdo)
     {
+    }
+
+    /**
+     * @throws ByteBuddyInvalidChannelException
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getAllChannels(string $guildId): array
+    {
+        $channelTypes = ChannelTypes::getAllChannelTypes();
+
+        $channels = [];
+
+        foreach ($channelTypes as $channelType) {
+            $channels[] = $this->getChannel($guildId, $channelType);
+        }
+
+        return $channels;
     }
 
     /**
@@ -33,7 +51,7 @@ class ChannelConfigRepository
 
             $result = $stmt->fetch()[$columnName];
 
-            return Channel::from($result);
+            return Channel::from($result, $channelType);
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch channel data', 500);
         }
