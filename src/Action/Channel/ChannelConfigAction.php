@@ -28,8 +28,6 @@ class ChannelConfigAction extends ByteBuddyAction
         }
 
         $result = $this->channelConfigService->getAllChannelsOrSpecific($guildId, $channelType);
-        $response->getBody()->write($result->getResponseAsJson());
-
         return $this->buildResponse($response, $result);
     }
 
@@ -50,8 +48,6 @@ class ChannelConfigAction extends ByteBuddyAction
         }
 
         $result = $this->channelConfigService->setChannel($guildId, $channelType, $parsedBody['channelId']);
-        $response->getBody()->write($result->getResponseAsJson());
-
         return $this->buildResponse($response, $result);
     }
 }
