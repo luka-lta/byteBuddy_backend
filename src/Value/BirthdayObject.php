@@ -25,7 +25,7 @@ final class BirthdayObject
         return [
             'guildId' => $this->guildId,
             'userId' => $this->userId,
-            'birthday' => $this->birthday->format('d.m.Y')
+            'birthday' => $this->birthday->format('Y-m-d')
         ];
     }
 

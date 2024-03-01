@@ -13,7 +13,7 @@ use Exception;
 class BirthdayService
 {
     public function __construct(
-        private readonly BirthdayRepository $birthdayRepository
+        private readonly BirthdayRepository $birthdayRepository,
     )
     {
     }
@@ -37,7 +37,7 @@ class BirthdayService
     public function setOrUpdateBirthday(string $guildId, string $userId, string $birthdayDate): ResultObject
     {
         try {
-            $birthdayDate = DateTime::createFromFormat('d.m.Y', $birthdayDate);
+            $birthdayDate = DateTime::createFromFormat('Y-m-d', $birthdayDate);
             $birthdayObject = BirthdayObject::from($guildId, $userId, $birthdayDate);
             $this->birthdayRepository->setOrUpdateBirthday($birthdayObject);
 
