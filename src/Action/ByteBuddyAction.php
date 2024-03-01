@@ -10,6 +10,7 @@ abstract class ByteBuddyAction
 {
     protected function buildResponse(ResponseInterface $response, ResultObject $resultObject): ResponseInterface
     {
+        $response->getBody()->write($resultObject->getResponseAsJson());
         return $response
             ->withHeader('Content-Type', 'application/json')
             ->withHeader('Access-Control-Allow-Origin', '*')

@@ -28,8 +28,6 @@ class GuildAction extends ByteBuddyAction
         }
 
         $result = $this->configService->registerGuild($guildId, $parsedBody['serverName']);
-        $response->getBody()->write($result->getResponseAsJson());
-
         return $this->buildResponse($response, $result);
     }
 
@@ -43,8 +41,6 @@ class GuildAction extends ByteBuddyAction
         }
 
         $result = $this->configService->getConfigData($guildId);
-        $response->getBody()->write($result->getResponseAsJson());
-
         return $this->buildResponse($response, $result);
     }
 
@@ -59,8 +55,6 @@ class GuildAction extends ByteBuddyAction
         }
 
         $result = $this->configService->setConfigValue($guildId, $parsedBody);
-        $response->getBody()->write($result->getResponseAsJson());
-
         return $this->buildResponse($response, $result);
     }
 }

@@ -27,8 +27,6 @@ class BirthdayAction extends ByteBuddyAction
         }
 
         $result = $this->birthdayService->getBirthdays($guildId);
-        $response->getBody()->write($result->getResponseAsJson());
-
         return $this->buildResponse($response, $result);
     }
 
@@ -55,8 +53,6 @@ class BirthdayAction extends ByteBuddyAction
         }
 
         $result = $this->birthdayService->setOrUpdateBirthday($guildId, $parsedBody['userId'], $parsedBody['birthdayDate']);
-        $response->getBody()->write($result->getResponseAsJson());
-
         return $this->buildResponse($response, $result);
     }
 }
