@@ -22,10 +22,6 @@ class BirthdayService
     {
         try {
             $birthdays = $this->birthdayRepository->getAllBirthdays($guildId);
-            if (!$birthdays) {
-                return ResultObject::from(false, 'No birthdays found', null, 404);
-            }
-
             return ResultObject::from(true, 'Birthdays found', $birthdays, 200);
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());

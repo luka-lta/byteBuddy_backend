@@ -25,6 +25,10 @@ class GuildRepository
             INSERT INTO guild_data (guild_id, server_name) VALUES (:guildId, :serverId)
         SQL;
 
+        if ($this->guildExists($guildId)) {
+            throw new ByteBuddyDatabaseException('Guild already exists', 400);
+        }
+
         try {
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([
@@ -45,6 +49,10 @@ class GuildRepository
             SELECT * FROM guild_data WHERE guild_id = $guildId
         SQL;
 
+        if (!$this->guildExists($guildId)) {
+            throw new ByteBuddyDatabaseException('Guild does not exist', 404);
+        }
+
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
@@ -60,25 +68,44 @@ class GuildRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function setConfigKey(string $guildId, string $row, string $value): bool
+    public function setConfigKey(string $guildId, string $row, string $value): void
     {
         $sql = <<<SQL
             UPDATE guild_data
             SET $row = :value WHERE guild_id = :guildId
         SQL;
+
+        if (!$this->guildExists($guildId)) {
+            throw new ByteBuddyDatabaseException('Guild does not exist', 404);
+        }
+
         try {
             $stmt = $this->pdo->prepare($sql);
 
-            if ($stmt->execute([
+            $stmt->execute([
                 'value' => $value,
                 'guildId' => $guildId
-            ])) {
-                return true;
-            }
-
-            return false;
+            ]);
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch config data', 500);
+        }
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function guildExists(string $guildId): bool
+    {
+        $sql = <<<SQL
+            SELECT guild_id FROM guild_data WHERE guild_id = :guildId
+        SQL;
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['guildId' => $guildId]);
+
+            return $stmt->fetch() !== false;
+        } catch (PDOException) {
+            throw new ByteBuddyDatabaseException('Failed to check if guild exists', 500);
         }
     }
 }
