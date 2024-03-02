@@ -11,7 +11,8 @@ use PDOException;
 class BirthdayRepository
 {
     public function __construct(
-        private readonly PDO $pdo
+        private readonly PDO $pdo,
+        private readonly GuildRepository $guildRepository,
     )
     {
     }
@@ -21,6 +22,10 @@ class BirthdayRepository
      */
     public function getBirthday(string $guildId, string $userId): BirthdayObject
     {
+        if (!$this->guildRepository->guildExists($guildId)) {
+            throw new ByteBuddyDatabaseException('Guild does not exist', 404);
+        }
+
         $sql = "SELECT birthday FROM birthday_data WHERE guild_id = :guildId AND user_id = :userId";
         try {
             $stmt = $this->pdo->prepare($sql);
@@ -35,21 +40,29 @@ class BirthdayRepository
         return BirthdayObject::from($guildId, $userId, $stmt->fetchColumn());
     }
 
-    public function getAllBirthdays(string $guildId): array|false
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getAllBirthdays(string $guildId): array
     {
         $sql = "SELECT user_id, birthday FROM birthday_data WHERE guild_id = :guildId";
+
+        if (!$this->guildRepository->guildExists($guildId)) {
+            throw new ByteBuddyDatabaseException('Guild does not exist', 404);
+        }
 
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['guildId' => $guildId]);
 
-            if ($stmt->rowCount() > 0)
-                return $stmt->fetchAll();
+            if ($stmt->rowCount() === 0) {
+                throw new ByteBuddyDatabaseException('No birthdays found', 404);
+            }
+
+            return $stmt->fetchAll();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch birthday data', 500);
         }
-
-        return false;
     }
 
     /**
@@ -65,13 +78,11 @@ class BirthdayRepository
 
         try {
             $stmt = $this->pdo->prepare($sql);
-            if ($stmt->execute([
+            $stmt->execute([
                 'guildId' => $birthday->getGuildId(),
                 'userId' => $birthday->getUserId(),
                 'birthday' => $birthday->getBirthday()->format('Y-m-d')
-            ])) {
-                return true;
-            }
+            ]);
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to set birthday data', 500);
         }
@@ -84,6 +95,10 @@ class BirthdayRepository
      */
     public function birthdayExists(string $guildId, string $userId): bool
     {
+        if (!$this->guildRepository->guildExists($guildId)) {
+            throw new ByteBuddyDatabaseException('Guild does not exist', 404);
+        }
+
         $sql = "SELECT COUNT(*) FROM birthday_data WHERE guild_id = :guildId AND user_id = :userId";
 
         try {

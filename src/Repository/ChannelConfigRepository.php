@@ -12,8 +12,10 @@ use PDOException;
 
 class ChannelConfigRepository
 {
-    public function __construct(private readonly PDO $pdo)
-    {
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly GuildRepository $guildRepository,
+    ) {
     }
 
     /**
@@ -39,6 +41,10 @@ class ChannelConfigRepository
      */
     public function getChannel(string $guildId, string $channelType): Channel
     {
+        if (!$this->guildRepository->guildExists($guildId)) {
+            throw new ByteBuddyDatabaseException('Guild does not exist', 404);
+        }
+
         $this->validateChannelType($channelType);
 
         $columnName = "{$channelType}_channel_id";
@@ -47,10 +53,15 @@ class ChannelConfigRepository
 
         try {
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['guildId' => $guildId]);
+            $stmt->execute([
+                'guildId' => $guildId
+            ]);
+
+            if ($stmt->rowCount() === 0) {
+                throw new ByteBuddyDatabaseException('No channels found', 404);
+            }
 
             $result = $stmt->fetch()[$columnName];
-
             return Channel::from($result, $channelType);
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch channel data', 500);
@@ -65,7 +76,7 @@ class ChannelConfigRepository
     {
         $this->validateChannelType($channelType);
 
-        if (!$this->guildExists($guildId)) {
+        if (!$this->guildRepository->guildExists($guildId)) {
             $this->createGuild($guildId);
         }
 
@@ -82,16 +93,6 @@ class ChannelConfigRepository
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to update channel data', 500);
         }
-    }
-
-    private function guildExists(string $guildId): bool
-    {
-        $sql = "SELECT guild_id FROM channel_data WHERE guild_id = :guildId";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['guildId' => $guildId]);
-
-        return $stmt->fetch() !== false;
     }
 
     public function createGuild(string $guildId): void

@@ -58,9 +58,7 @@ class GuildService
     {
         try {
             foreach ($changedValues as $key => $value) {
-                if (!$this->configRepository->setConfigKey($guildId, $key, $value)) {
-                    return ResultObject::from(false, 'Failed to update config data', null, 500);
-                }
+                $this->configRepository->setConfigKey($guildId, $key, $value);
             }
         } catch (ByteBuddyException $e) {
             return ResultObject::from(false, $e->getMessage(), null, $e->getCode());

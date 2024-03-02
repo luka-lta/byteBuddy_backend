@@ -23,6 +23,7 @@ class ChannelConfigService
         try {
             if ($channelType) {
                 $channel = $this->channelConfigRepository->getChannel($guildId, $channelType);
+
                 return ResultObject::from(
                     true,
                     'Channel fetched successfully',
