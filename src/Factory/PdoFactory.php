@@ -9,11 +9,11 @@ class PdoFactory
 {
     public function __invoke(): PDO
     {
-        $host = 'byteBuddy-api';
+        $host = getenv('MYSQL_HOST');
         $port = 3306;
-        $database = 'byteBuddy_api';
-        $username = 'testing';
-        $password = '1234';
+        $database = getenv('MYSQL_DATABASE');
+        $username = getenv('MYSQL_USER');
+        $password = getenv('MYSQL_PASSWORD');
 
         $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s', $host, $port, $database);
         $pdo = new PDO($dsn, $username, $password);

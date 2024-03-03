@@ -20,7 +20,7 @@ services:
     container_name: 'php-fpm'
     working_dir: /app
     environment:
-      APP_ENV: 'development'
+      APP_ENV: 'production'
       MYSQL_DATABASE: 'byteBuddy_api'
       MYSQL_HOST: 'byteBuddy-api'
       MYSQL_USER: 'testing'
