@@ -18,11 +18,17 @@ class CommandService
     {
     }
 
-    public function registerNewCommand(array $commandData): ResultObject
+    public function registerNewCommands(array $commandsData): ResultObject
     {
         try {
-            $command = Command::fromArray($commandData);
-            $this->commandRepository->registerNewCommand($command);
+            $commands = [];
+
+            foreach ($commandsData as $commandData) {
+                $command = Command::fromArray($commandData);
+                $commands[] = $command;
+            }
+
+            $this->commandRepository->registerNewCommands($commands);
             return ResultObject::from(true, 'Command registered', null, 201);
         } catch (ByteBuddyException $exception) {
             $this->logger->error('Failed to register new command', ['exception' => $exception->getPrevious()]);

@@ -24,7 +24,7 @@ class CommandAction extends ByteBuddyAction
             return $this->buildResponse($response, $result);
         }
 
-        $result = $this->commandStatusService->registerNewCommand($commandData);
+        $result = $this->commandStatusService->registerNewCommands($commandData);
         return $this->buildResponse($response, $result);
     }
 
