@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Route;
 
+use ByteBuddyApi\Action\Auth\DiscordAuthAction;
 use ByteBuddyApi\Action\Birthday\BirthdayAction;
 use ByteBuddyApi\Action\Channel\ChannelConfigAction;
-use ByteBuddyApi\Action\Command\CommandStatusAction;
+use ByteBuddyApi\Action\Command\CommandAction;
 use ByteBuddyApi\Action\Guild\GuildAction;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -26,9 +27,13 @@ class Routes
             $group->get('/birthdays', [BirthdayAction::class, 'handleGetBirthdaysFromGuildAction']);
             $group->post('/birthdays', [BirthdayAction::class, 'handleSetOrUpdateBirthdaysAction']);
 
-            $group->get('/commands/disabled', [CommandStatusAction::class, 'handleGetDisabledCommandsAction']);
-            $group->post('/commands/enable', [CommandStatusAction::class, 'handleEnableCommandAction']);
-            $group->post('/commands/disable', [CommandStatusAction::class, 'handleDisableCommandAction']);
+            $group->get('/commands', [CommandAction::class, 'handleGetCommandsAction']);
+            $group->get('/commands/register', [CommandAction::class, 'handleRegisterCommandAction']);
+            $group->post('/commands/enable', [CommandAction::class, 'handleEnableCommandAction']);
+            $group->post('/commands/disable', [CommandAction::class, 'handleDisableCommandAction']);
+
+            $group->get('/auth/discord', [DiscordAuthAction::class, 'handleDiscordAuthAction']);
+            $group->get('/auth/discord/callback', [DiscordAuthAction::class, 'handleDiscordCallbackAuthAction']);
         });
     }
 }

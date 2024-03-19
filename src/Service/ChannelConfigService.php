@@ -6,6 +6,7 @@ namespace ByteBuddyApi\Service;
 use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Exception\ByteBuddyInvalidChannelException;
 use ByteBuddyApi\Repository\ChannelConfigRepository;
+use ByteBuddyApi\Type\ChannelTypes;
 use ByteBuddyApi\Value\Channel;
 use ByteBuddyApi\Value\ResultObject;
 use Exception;
