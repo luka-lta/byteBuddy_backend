@@ -20,22 +20,35 @@ class CommandRepository
 
     /**
      * @throws ByteBuddyDatabaseException
-     * @throws ByteBuddyCommandAlreadyDisabledException
      */
     public function registerNewCommands(array $commands): void
     {
-        $sql = <<<SQL
-            INSERT INTO command_data (name, description, disabled) VALUES (:name, :description, :disabled)
+        // TODO: Add a check if command old and can be deleted
+        $insertSql = <<<SQL
+        INSERT INTO command_data (name, description, disabled) VALUES (:name, :description, :disabled)
         SQL;
 
+        $updateSql = <<<SQL
+        UPDATE command_data SET description = :description, disabled = :disabled WHERE name = :name
+        SQL;
+
+        $insertStmt = $this->pdo->prepare($insertSql);
+        $updateStmt = $this->pdo->prepare($updateSql);
+
+        /** @var Command $command */
         foreach ($commands as $command) {
+
             if ($this->commandExists($command->getName())) {
+                $updateStmt->execute([
+                    'name' => $command->getName(),
+                    'description' => $command->getDescription(),
+                    'disabled' => $command->isDisabled() ? 1 : 0
+                ]);
                 continue;
             }
 
             try {
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
+                $insertStmt->execute([
                     'name' => $command->getName(),
                     'description' => $command->getDescription(),
                     'disabled' => $command->isDisabled() ? 1 : 0
@@ -45,6 +58,7 @@ class CommandRepository
             }
         }
     }
+
 
     /**
      * @throws ByteBuddyCommandNotFoundException
