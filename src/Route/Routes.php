@@ -28,7 +28,7 @@ class Routes
             $group->post('/birthdays', [BirthdayAction::class, 'handleSetOrUpdateBirthdaysAction']);
 
             $group->get('/commands', [CommandAction::class, 'handleGetCommandsAction']);
-            $group->get('/commands/register', [CommandAction::class, 'handleRegisterCommandAction']);
+            $group->post('/commands/register', [CommandAction::class, 'handleRegisterCommandAction']);
             $group->post('/commands/enable', [CommandAction::class, 'handleEnableCommandAction']);
             $group->post('/commands/disable', [CommandAction::class, 'handleDisableCommandAction']);
 
