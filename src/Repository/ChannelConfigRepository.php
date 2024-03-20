@@ -108,8 +108,8 @@ class ChannelConfigRepository
      */
     private function validateChannelType(string $channelType): void
     {
-        if (!in_array($channelType, ['welcome', 'leave', 'birthday'])) {
-            throw new ByteBuddyInvalidChannelException('Invalid channel type');
+        if (!in_array($channelType, ChannelTypes::getAllChannelTypes())) {
+            throw new ByteBuddyInvalidChannelException('Invalid channel type', 400);
         }
     }
 }
