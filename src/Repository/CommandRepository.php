@@ -9,6 +9,7 @@ use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Value\Command;
 use PDO;
 use PDOException;
+use PDOStatement;
 
 class CommandRepository
 {
@@ -23,7 +24,6 @@ class CommandRepository
      */
     public function registerNewCommands(array $commands): void
     {
-        // TODO: Add a check if command old and can be deleted
         $insertSql = <<<SQL
         INSERT INTO command_data (name, description, disabled) VALUES (:name, :description, :disabled)
         SQL;
@@ -35,8 +35,12 @@ class CommandRepository
         $insertStmt = $this->pdo->prepare($insertSql);
         $updateStmt = $this->pdo->prepare($updateSql);
 
+        $existingCommands = [];
+
         /** @var Command $command */
         foreach ($commands as $command) {
+
+            $existingCommands[] = $command->getName();
 
             if ($this->commandExists($command->getName())) {
                 $updateStmt->execute([
@@ -57,6 +61,8 @@ class CommandRepository
                 throw new ByteBuddyDatabaseException('Failed to register new command', 500, $exception);
             }
         }
+
+        $this->deleteObsoleteCommands($existingCommands);
     }
 
 
@@ -192,5 +198,15 @@ class CommandRepository
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if command exists', 500);
         }
+    }
+
+    private function deleteObsoleteCommands(array $existingCommands): void
+    {
+        $placeholders = implode(', ', array_fill(0, count($existingCommands), '?'));
+
+        $sql = "DELETE FROM command_data WHERE name NOT IN ($placeholders)";
+
+        $deleteStmt = $this->pdo->prepare($sql);
+        $deleteStmt->execute($existingCommands);
     }
 }
