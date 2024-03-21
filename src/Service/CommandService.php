@@ -50,6 +50,11 @@ class CommandService
     {
         try {
             $result = $this->commandRepository->getAvailableCommands();
+
+            if (!$result) {
+                return ResultObject::from(true, 'No available commands', null, 404);
+            }
+
             return ResultObject::from(true, 'Available commands retrieved', $result, 200);
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
@@ -60,7 +65,12 @@ class CommandService
     {
         try {
             $result = $this->commandRepository->getAllCommands();
-            return ResultObject::from(true, 'All commands retrieved', $result, 200);
+
+            if (!$result) {
+                return ResultObject::from(true, 'No commands found', null, 404);
+            }
+
+            return ResultObject::from(true, 'Commands found', $result, 200);
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
         }
@@ -70,7 +80,12 @@ class CommandService
     {
         try {
             $result = $this->commandRepository->getDisabledCommands();
-            return ResultObject::from(true, 'Disabled commands retrieved', $result, 200);
+
+            if (!$result) {
+                return ResultObject::from(true, 'No disabled commands found', null, 404);
+            }
+
+            return ResultObject::from(true, 'Disabled commands found', $result, 200);
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
         }

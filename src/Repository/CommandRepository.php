@@ -91,7 +91,7 @@ class CommandRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getAvailableCommands(): array
+    public function getAvailableCommands(): array|null
     {
         $sql = <<<SQL
             SELECT * FROM command_data WHERE disabled = 0
@@ -99,6 +99,11 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
+
+            if ($stmt->rowCount() === 0) {
+                return null;
+            }
+
             return $stmt->fetchAll();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to get available commands', 500);
@@ -108,7 +113,7 @@ class CommandRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getAllCommands(): array
+    public function getAllCommands(): array|null
     {
         $sql = <<<SQL
             SELECT * FROM command_data
@@ -116,6 +121,11 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
+
+            if ($stmt->rowCount() === 0) {
+                return null;
+            }
+
             return $stmt->fetchAll();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to get all commands', 500);
@@ -125,7 +135,7 @@ class CommandRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getDisabledCommands(): array
+    public function getDisabledCommands(): array|null
     {
         $sql = <<<SQL
             SELECT * FROM command_data WHERE disabled = 1
@@ -133,6 +143,11 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
+
+            if ($stmt->rowCount() === 0) {
+                return null;
+            }
+
             return $stmt->fetchAll();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to get disabled commands', 500);

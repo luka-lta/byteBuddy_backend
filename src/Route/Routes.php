@@ -8,6 +8,7 @@ use ByteBuddyApi\Action\Birthday\BirthdayAction;
 use ByteBuddyApi\Action\Channel\ChannelConfigAction;
 use ByteBuddyApi\Action\Command\CommandAction;
 use ByteBuddyApi\Action\Guild\GuildAction;
+use ByteBuddyApi\Action\Health\HealthAction;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
@@ -16,6 +17,8 @@ class Routes
     public static function getRoutes(App $app): void
     {
         $app->group('/api/v1', function (RouteCollectorProxy $group) {
+            $group->get('/health', [HealthAction::class, 'handleHealthAction']);
+
             $group->post('/register', [GuildAction::class, 'handleRegisterGuild']);
 
             $group->get('/guild', [GuildAction::class, 'handleGetConfigAction']);
