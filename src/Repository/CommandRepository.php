@@ -156,45 +156,53 @@ class CommandRepository
 
     /**
      * @throws ByteBuddyDatabaseException
-     * @throws ByteBuddyCommandNotFoundException
      */
-    public function enableCommand(string $name): void
+    public function toggleCommandById(int $id): bool
     {
         $sql = <<<SQL
-            UPDATE command_data SET disabled = 0 WHERE name = :name
+            UPDATE command_data SET disabled = NOT disabled WHERE id = :id
         SQL;
 
         try {
-            if (!$this->commandExists($name)) {
-                throw new ByteBuddyCommandNotFoundException('Command not found', 404);
-            }
-
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['name' => $name]);
+            $stmt->execute(['id' => $id]);
+
+            $statusSql = <<<SQL
+            SELECT disabled FROM command_data WHERE id = :id
+        SQL;
+            $statusStmt = $this->pdo->prepare($statusSql);
+            $statusStmt->execute(['id' => $id]);
+            $status = $statusStmt->fetchColumn();
+
+            return (bool) $status;
         } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to enable command', 500);
+            throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
         }
     }
 
     /**
-     * @throws ByteBuddyCommandNotFoundException
      * @throws ByteBuddyDatabaseException
      */
-    public function disableCommand(string $name): void
+    public function toggleCommandByName(string $name): bool
     {
         $sql = <<<SQL
-            UPDATE command_data SET disabled = 1 WHERE name = :name
+            UPDATE command_data SET disabled = NOT disabled WHERE name = :name
         SQL;
-
-        if (!$this->commandExists($name)) {
-            throw new ByteBuddyCommandNotFoundException('Command not found', 404);
-        }
 
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['name' => $name]);
+
+            $statusSql = <<<SQL
+            SELECT disabled FROM command_data WHERE name = :name
+        SQL;
+            $statusStmt = $this->pdo->prepare($statusSql);
+            $statusStmt->execute(['name' => $name]);
+            $status = $statusStmt->fetchColumn();
+
+            return (bool) $status;
         } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to disable command', 500);
+            throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
         }
     }
 

@@ -91,21 +91,27 @@ class CommandService
         }
     }
 
-    public function enableCommand(string $name): ResultObject
+    public function toggleCommandById(int $id): ResultObject
     {
         try {
-            $this->commandRepository->enableCommand($name);
-            return ResultObject::from(true, 'Command enabled', null, 200);
+            $state = $this->commandRepository->toggleCommandById($id);
+
+            $message = $state ? 'Command enabled' : 'Command disabled';
+
+            return ResultObject::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 
-    public function disableCommand(string $name): ResultObject
+    public function toggleCommandByName(string $name): ResultObject
     {
         try {
-            $this->commandRepository->disableCommand($name);
-            return ResultObject::from(true, 'Command disabled', null, 200);
+            $state = $this->commandRepository->toggleCommandByName($name);
+
+            $message = $state ? 'Command enabled' : 'Command disabled';
+
+            return ResultObject::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
             return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
         }

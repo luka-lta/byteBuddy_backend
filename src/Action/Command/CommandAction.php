@@ -48,29 +48,19 @@ class CommandAction extends ByteBuddyAction
         return $this->buildResponse($response, $result);
     }
 
-    public function handleEnableCommandAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function handleToggleCommand(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $name = $request->getQueryParams()['name'] ?? null;
-
-        if ($name === null) {
-            $result = ResultObject::from(false, 'Name is required', null, 400);
+        if (isset($request->getQueryParams()['name'])) {
+            $result = $this->commandStatusService->toggleCommandByName($request->getQueryParams()['name']);
             return $this->buildResponse($response, $result);
         }
 
-        $result = $this->commandStatusService->enableCommand($name);
-        return $this->buildResponse($response, $result);
-    }
-
-    public function handleDisableCommandAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
-        $name = $request->getQueryParams()['name'] ?? null;
-
-        if ($name === null) {
-            $result = ResultObject::from(false, 'Name ID is required', null, 400);
+        if (isset($request->getQueryParams()['id'])) {
+            $result = $this->commandStatusService->toggleCommandById((int)$request->getQueryParams()['id']);
             return $this->buildResponse($response, $result);
         }
 
-        $result = $this->commandStatusService->disableCommand($name);
+        $result = ResultObject::from(false, 'Name or ID is required', null, 400);
         return $this->buildResponse($response, $result);
     }
 }
