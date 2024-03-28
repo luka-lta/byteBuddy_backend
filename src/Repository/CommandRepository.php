@@ -156,9 +156,14 @@ class CommandRepository
 
     /**
      * @throws ByteBuddyDatabaseException
+     * @throws ByteBuddyCommandNotFoundException
      */
     public function toggleCommandById(int $id): bool
     {
+        if (!$this->commandExistsById($id)) {
+            throw new ByteBuddyCommandNotFoundException('Command not found', 404);
+        }
+
         $sql = <<<SQL
             UPDATE command_data SET disabled = NOT disabled WHERE id = :id
         SQL;
@@ -181,10 +186,14 @@ class CommandRepository
     }
 
     /**
-     * @throws ByteBuddyDatabaseException
+     * @throws ByteBuddyDatabaseException|ByteBuddyCommandNotFoundException
      */
     public function toggleCommandByName(string $name): bool
     {
+        if (!$this->commandExists($name)) {
+            throw new ByteBuddyCommandNotFoundException('Command not found', 404);
+        }
+
         $sql = <<<SQL
             UPDATE command_data SET disabled = NOT disabled WHERE name = :name
         SQL;
@@ -217,6 +226,23 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['name' => $name]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException) {
+            throw new ByteBuddyDatabaseException('Failed to check if command exists', 500);
+        }
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function commandExistsById(int $id): bool
+    {
+        $sql = <<<SQL
+            SELECT * FROM command_data WHERE id = :id
+        SQL;
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['id' => $id]);
             return $stmt->rowCount() > 0;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if command exists', 500);
