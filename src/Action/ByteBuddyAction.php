@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Action;
 
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class ByteBuddyAction
 {
-    protected function buildResponse(ResponseInterface $response, ResultObject $resultObject): ResponseInterface
+    protected function buildResponse(ResponseInterface $response, Result $resultObject): ResponseInterface
     {
         $response->getBody()->write($resultObject->getResponseAsJson());
         return $response

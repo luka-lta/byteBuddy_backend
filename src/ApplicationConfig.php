@@ -8,9 +8,9 @@ use ByteBuddyApi\Factory\OAuthProviderFactory;
 use ByteBuddyApi\Factory\PdoFactory;
 use DI\Definition\Source\DefinitionArray;
 use Exception;
-use League\OAuth2\Client\Provider\GenericProvider;
 use Monolog\Logger;
 use PDO;
+use Wohali\OAuth2\Client\Provider\Discord;
 use function DI\factory;
 
 class ApplicationConfig extends DefinitionArray
@@ -28,7 +28,7 @@ class ApplicationConfig extends DefinitionArray
         return [
             PDO::class => factory(new PdoFactory()),
             Logger::class => factory(new LoggerFactory()),
-            GenericProvider::class => factory (new OAuthProviderFactory())
+            Discord::class => factory (new OAuthProviderFactory())
         ];
     }
 }

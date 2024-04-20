@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Route;
 
 use ByteBuddyApi\Action\Auth\DiscordAuthAction;
+use ByteBuddyApi\Action\Auth\LoginAction;
+use ByteBuddyApi\Action\Auth\RegisterAction;
 use ByteBuddyApi\Action\Birthday\BirthdayAction;
 use ByteBuddyApi\Action\Channel\ChannelConfigAction;
 use ByteBuddyApi\Action\Command\CommandAction;
@@ -34,8 +36,22 @@ class Routes
             $group->post('/commands/toggle', [CommandAction::class, 'handleToggleCommand']);
             $group->post('/commands/register', [CommandAction::class, 'handleRegisterCommandAction']);
 
-            $group->get('/auth/discord', [DiscordAuthAction::class, 'handleDiscordAuthAction']);
-            $group->get('/auth/discord/callback', [DiscordAuthAction::class, 'handleDiscordCallbackAuthAction']);
+            $group->group('/user', function (RouteCollectorProxy $user) {
+                $user->post('/register', [RegisterAction::class, 'handleRegisterNewUser']);
+                $user->post('/login', [LoginAction::class, 'handleLogin']);
+//
+//                $user->get('/{id:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
+//                $user->get('/{id:[0-9]+}/roles', [DiscordAuthAction::class, 'handleDiscordAuth']);
+//                $user->post('/{id:[0-9]+}/roles', [DiscordAuthAction::class, 'handleDiscordAuth']);
+//                $user->delete('/{id:[0-9]+}/roles/{roleId:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
+//
+//                $user->put('/{id:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
+//                $user->delete('/{id:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
+//
+//                $user->get('/{id:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
+//
+//                $user->get('/roles', [DiscordAuthAction::class, 'handleDiscordAuth']);
+            });
         });
     }
 }

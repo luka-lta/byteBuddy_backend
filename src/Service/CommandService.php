@@ -6,7 +6,7 @@ namespace ByteBuddyApi\Service;
 use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\CommandRepository;
 use ByteBuddyApi\Value\Command;
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Monolog\Logger;
 
 class CommandService
@@ -18,7 +18,7 @@ class CommandService
     {
     }
 
-    public function registerNewCommands(array $commandsData): ResultObject
+    public function registerNewCommands(array $commandsData): Result
     {
         try {
             $commands = [];
@@ -29,91 +29,91 @@ class CommandService
             }
 
             $this->commandRepository->registerNewCommands($commands);
-            return ResultObject::from(true, 'Command registered', null, 201);
+            return Result::from(true, 'Command registered', null, 201);
         } catch (ByteBuddyException $exception) {
             $this->logger->error('Failed to register new command', ['exception' => $exception->getPrevious()]);
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 
-    public function deleteCommand(string $name): ResultObject
+    public function deleteCommand(string $name): Result
     {
         try {
             $this->commandRepository->deleteCommand($name);
-            return ResultObject::from(true, 'Command deleted', null, 200);
+            return Result::from(true, 'Command deleted', null, 200);
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 
-    public function getAvailableCommands(): ResultObject
+    public function getAvailableCommands(): Result
     {
         try {
             $result = $this->commandRepository->getAvailableCommands();
 
             if (!$result) {
-                return ResultObject::from(true, 'No available commands', null, 404);
+                return Result::from(true, 'No available commands', null, 404);
             }
 
-            return ResultObject::from(true, 'Available commands retrieved', $result, 200);
+            return Result::from(true, 'Available commands retrieved', $result, 200);
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 
-    public function getAllCommands(): ResultObject
+    public function getAllCommands(): Result
     {
         try {
             $result = $this->commandRepository->getAllCommands();
 
             if (!$result) {
-                return ResultObject::from(true, 'No commands found', null, 404);
+                return Result::from(true, 'No commands found', null, 404);
             }
 
-            return ResultObject::from(true, 'Commands found', $result, 200);
+            return Result::from(true, 'Commands found', $result, 200);
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 
-    public function getDisabledCommand(): ResultObject
+    public function getDisabledCommand(): Result
     {
         try {
             $result = $this->commandRepository->getDisabledCommands();
 
             if (!$result) {
-                return ResultObject::from(true, 'No disabled commands found', null, 404);
+                return Result::from(true, 'No disabled commands found', null, 404);
             }
 
-            return ResultObject::from(true, 'Disabled commands found', $result, 200);
+            return Result::from(true, 'Disabled commands found', $result, 200);
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 
-    public function toggleCommandById(int $id): ResultObject
+    public function toggleCommandById(int $id): Result
     {
         try {
             $state = $this->commandRepository->toggleCommandById($id);
 
             $message = $state ? 'Command enabled' : 'Command disabled';
 
-            return ResultObject::from(true, $message, null, 200);
+            return Result::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 
-    public function toggleCommandByName(string $name): ResultObject
+    public function toggleCommandByName(string $name): Result
     {
         try {
             $state = $this->commandRepository->toggleCommandByName($name);
 
             $message = $state ? 'Command enabled' : 'Command disabled';
 
-            return ResultObject::from(true, $message, null, 200);
+            return Result::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         }
     }
 }

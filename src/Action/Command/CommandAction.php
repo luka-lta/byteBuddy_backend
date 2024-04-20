@@ -5,7 +5,7 @@ namespace ByteBuddyApi\Action\Command;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Service\CommandService;
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -20,7 +20,7 @@ class CommandAction extends ByteBuddyAction
         $commandData = $request->getParsedBody();
 
         if ($commandData === null) {
-            $result = ResultObject::from(false, 'Command data is required', null, 400);
+            $result = Result::from(false, 'Command data is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
@@ -39,7 +39,7 @@ class CommandAction extends ByteBuddyAction
                     $result = $this->commandStatusService->getDisabledCommand();
                     return $this->buildResponse($response, $result);
                 default:
-                    $result = ResultObject::from(false, 'Invalid status', null, 400);
+                    $result = Result::from(false, 'Invalid status', null, 400);
                     return $this->buildResponse($response, $result);
             }
         }
@@ -60,7 +60,7 @@ class CommandAction extends ByteBuddyAction
             return $this->buildResponse($response, $result);
         }
 
-        $result = ResultObject::from(false, 'Name or ID is required', null, 400);
+        $result = Result::from(false, 'Name or ID is required', null, 400);
         return $this->buildResponse($response, $result);
     }
 }

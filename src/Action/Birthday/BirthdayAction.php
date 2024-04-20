@@ -5,7 +5,7 @@ namespace ByteBuddyApi\Action\Birthday;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Service\BirthdayService;
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -22,7 +22,7 @@ class BirthdayAction extends ByteBuddyAction
         $guildId = $request->getQueryParams()['guildId'] ?? null;
 
         if (!$guildId) {
-            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            $result = Result::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
@@ -38,17 +38,17 @@ class BirthdayAction extends ByteBuddyAction
         $userId = $parsedBody['userId'] ?? null;
 
         if (!$guildId) {
-            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            $result = Result::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
         if (!$userId) {
-            $result = ResultObject::from(false, 'User ID is required', null, 400);
+            $result = Result::from(false, 'User ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
         if (!$birthdayString) {
-            $result = ResultObject::from(false, 'Birthday date is required', null, 400);
+            $result = Result::from(false, 'Birthday date is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 

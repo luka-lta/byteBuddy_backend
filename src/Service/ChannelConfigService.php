@@ -8,7 +8,7 @@ use ByteBuddyApi\Exception\ByteBuddyInvalidChannelException;
 use ByteBuddyApi\Repository\ChannelConfigRepository;
 use ByteBuddyApi\Type\ChannelTypes;
 use ByteBuddyApi\Value\Channel;
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Exception;
 
 class ChannelConfigService
@@ -19,13 +19,13 @@ class ChannelConfigService
     {
     }
 
-    public function getAllChannelsOrSpecific(string $guildId, string|null $channelType): ResultObject
+    public function getAllChannelsOrSpecific(string $guildId, string|null $channelType): Result
     {
         try {
             if ($channelType) {
                 $channel = $this->channelConfigRepository->getChannel($guildId, $channelType);
 
-                return ResultObject::from(
+                return Result::from(
                     true,
                     'Channel fetched successfully',
                     $channel->asArray(),
@@ -41,7 +41,7 @@ class ChannelConfigService
                 $channelArray[] = $channel->asArray();
             }
 
-            return ResultObject::from(
+            return Result::from(
                 true,
                 'Channels fetched successfully',
                 $channelArray,
@@ -49,31 +49,31 @@ class ChannelConfigService
             );
 
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         } catch (Exception) {
-            return ResultObject::from(false, 'An error occurred', null, 500);
+            return Result::from(false, 'An error occurred', null, 500);
         }
     }
 
-    public function setChannel(string $guildId, string $channelType, string $channelId): ResultObject
+    public function setChannel(string $guildId, string $channelType, string $channelId): Result
     {
         if ($guildId == null) {
-            return ResultObject::from(false, 'GuildId must be set', null, 400);
+            return Result::from(false, 'GuildId must be set', null, 400);
         }
 
         if ($channelType == null) {
-            return ResultObject::from(false, 'Channel type must be set', null, 400);
+            return Result::from(false, 'Channel type must be set', null, 400);
         }
 
         try {
             $channel = Channel::from($channelId, $channelType);
             $this->channelConfigRepository->setChannel($guildId, $channel, $channelType);
         } catch (ByteBuddyException $exception) {
-            return ResultObject::from(false, $exception->getMessage(), null, $exception->getCode());
+            return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         } catch (Exception) {
-            return ResultObject::from(false, 'An error occurred', null, 500);
+            return Result::from(false, 'An error occurred', null, 500);
         }
 
-        return ResultObject::from(true, 'Channel updated successfully', null, 200);
+        return Result::from(true, 'Channel updated successfully', null, 200);
     }
 }

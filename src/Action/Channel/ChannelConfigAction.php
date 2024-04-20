@@ -5,7 +5,7 @@ namespace ByteBuddyApi\Action\Channel;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Service\ChannelConfigService;
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -23,7 +23,7 @@ class ChannelConfigAction extends ByteBuddyAction
         $channelType = $request->getQueryParams()['channelType'] ?? null;
 
         if (!$guildId) {
-            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            $result = Result::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
@@ -38,12 +38,12 @@ class ChannelConfigAction extends ByteBuddyAction
         $parsedBody = $request->getParsedBody();
 
         if (!$guildId) {
-            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            $result = Result::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
         if (!$channelType) {
-            $result = ResultObject::from(false, 'Channel type is required', null, 400);
+            $result = Result::from(false, 'Channel type is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 

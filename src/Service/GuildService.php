@@ -5,7 +5,7 @@ namespace ByteBuddyApi\Service;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\GuildRepository;
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Exception;
 use Monolog\Logger;
 
@@ -18,17 +18,17 @@ class GuildService
     {
     }
 
-    public function registerGuild(string $guildId, string $serverName): ResultObject
+    public function registerGuild(string $guildId, string $serverName): Result
     {
         try {
             $this->configRepository->registerNewGuild($guildId, $serverName);
         } catch (ByteBuddyException $e) {
-            return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
         } catch (Exception) {
-            return ResultObject::from(false, 'An error occurred', null, 500);
+            return Result::from(false, 'An error occurred', null, 500);
         }
 
-        return ResultObject::from(
+        return Result::from(
             true,
             'Config data fetched successfully',
             null,
@@ -36,17 +36,17 @@ class GuildService
         );
     }
 
-    public function getConfigData(string $guildId): ResultObject
+    public function getConfigData(string $guildId): Result
     {
         try {
             $configData = $this->configRepository->getConfigData($guildId);
         } catch (ByteBuddyException $e) {
-            return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
         } catch (Exception) {
-            return ResultObject::from(false, 'An error occurred', null, 500);
+            return Result::from(false, 'An error occurred', null, 500);
         }
 
-        return ResultObject::from(
+        return Result::from(
             true,
             'Config data fetched successfully',
             $configData->asArray(),
@@ -54,18 +54,18 @@ class GuildService
         );
     }
 
-    public function setConfigValue(string $guildId, array $changedValues): ResultObject
+    public function setConfigValue(string $guildId, array $changedValues): Result
     {
         try {
             foreach ($changedValues as $key => $value) {
                 $this->configRepository->setConfigKey($guildId, $key, $value);
             }
         } catch (ByteBuddyException $e) {
-            return ResultObject::from(false, $e->getMessage(), null, $e->getCode());
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
         } catch (Exception) {
-            return ResultObject::from(false, 'An error occurred', null, 500);
+            return Result::from(false, 'An error occurred', null, 500);
         }
 
-        return ResultObject::from(true, 'Config data updated successfully', null, 200);
+        return Result::from(true, 'Config data updated successfully', null, 200);
     }
 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Value;
 
-final class ResultObject
+final class Result
 {
     private function __construct(
         private readonly bool $success,

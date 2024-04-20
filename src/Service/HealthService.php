@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Service;
 
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 
 class HealthService
 {
-    public function checkApiHealth(): ResultObject
+    public function checkApiHealth(): Result
     {
-        return ResultObject::from(true, 'API is healthy', null, 200);
+        return Result::from(true, 'API is healthy', null, 200);
     }
 }

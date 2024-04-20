@@ -23,6 +23,7 @@
         "nyholm/psr7-server": "^1.1",
         "laminas/laminas-diactoros": "^3.3",
         "monolog/monolog": "^3.5",
-        "league/oauth2-client": "^2.7"
+        "wohali/oauth2-discord-new": "^1.2",
+      "ext-http": "*"
     }
 }

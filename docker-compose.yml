@@ -25,6 +25,7 @@ services:
       MYSQL_HOST: 'byteBuddy-api'
       MYSQL_USER: 'testing'
       MYSQL_PASSWORD: '1234'
+      JWT_SECRET: '399aa5bf8ba542fb6f72c5ed7c87f16b4a57c9c197ab8bad70625bc5cd6268f5'
     volumes:
       - ./:/app:rw
 

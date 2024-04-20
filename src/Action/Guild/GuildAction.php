@@ -5,7 +5,7 @@ namespace ByteBuddyApi\Action\Guild;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Service\GuildService;
-use ByteBuddyApi\Value\ResultObject;
+use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -23,7 +23,7 @@ class GuildAction extends ByteBuddyAction
         $parsedBody = $request->getParsedBody();
 
         if (!$guildId) {
-            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            $result = Result::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
@@ -36,7 +36,7 @@ class GuildAction extends ByteBuddyAction
         $guildId = $request->getQueryParams()['guildId'] ?? null;
 
         if (!$guildId) {
-            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            $result = Result::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
@@ -50,7 +50,7 @@ class GuildAction extends ByteBuddyAction
         $parsedBody = $request->getParsedBody();
 
         if (!$guildId) {
-            $result = ResultObject::from(false, 'Guild ID is required', null, 400);
+            $result = Result::from(false, 'Guild ID is required', null, 400);
             return $this->buildResponse($response, $result);
         }
 
