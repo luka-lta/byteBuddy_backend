@@ -57,4 +57,18 @@ class JwtService
 
         return true;
     }
+
+    public function getUserDataFromToken(string $token): array
+    {
+        $secretKey = getenv('JWT_SECRET');
+        $algorithm = 'HS256';
+
+        $token = str_replace('Bearer ', '', $token);
+        $decoded = JWT::decode($token, $secretKey, [$algorithm]);
+
+        return [
+            'uid' => $decoded->uid,
+            'name' => $decoded->name,
+        ];
+    }
 }

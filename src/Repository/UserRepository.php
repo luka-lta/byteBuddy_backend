@@ -23,7 +23,7 @@ class UserRepository
      */
     public function createUser(User $user): User
     {
-        if ($this->findUserByEmail($user->getEmail())) {
+        if ($this->userExists($user->getEmail())) {
             throw new ByteBuddyUserAlreadyExistsException('User with this email already exists', 409);
         }
 
@@ -112,6 +112,34 @@ class UserRepository
         } catch (PDOException $e) {
             throw new ByteBuddyDatabaseException('Failed to delete user', 500, $e);
         }
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function userExists(string $email): bool
+    {
+        $sql = <<<SQL
+            SELECT 
+                COUNT(*)
+            FROM 
+                users
+            WHERE 
+                email = :email
+        SQL;
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'email' => $email
+            ]);
+
+            $count = $stmt->fetchColumn();
+        } catch (PDOException) {
+            throw new ByteBuddyDatabaseException('Failed to check if user exists', 500);
+        }
+
+        return $count > 0;
     }
 
     /**

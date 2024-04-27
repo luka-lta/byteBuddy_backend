@@ -15,6 +15,7 @@ class UserService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly JwtService $jwtService,
+        private readonly AccessService $accessService,
     ) {
     }
 
@@ -51,5 +52,20 @@ class UserService
             'token' => $token,
             'user' => $user->toArray(),
         ], 200);
+    }
+
+    public function getUserById(int $userId, string $token): Result
+    {
+        try {
+            $user = $this->userRepository->findUserById($userId);
+
+            if (!$this->accessService->hasAccess($userId, $token)) {
+                return Result::from(false, 'Unauthorized access', null, 403);
+            }
+        } catch (ByteBuddyException $e) {
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
+        }
+
+        return Result::from(true, 'User found', $user->toArray(), 200);
     }
 }
