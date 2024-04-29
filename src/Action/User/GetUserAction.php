@@ -25,4 +25,11 @@ class GetUserAction extends ByteBuddyAction
 
         return $this->buildResponse($response, $result);
     }
+
+    public function handleGetAllUserAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        $result = $this->userService->getAllUsers();
+
+        return $this->buildResponse($response, $result);
+    }
 }

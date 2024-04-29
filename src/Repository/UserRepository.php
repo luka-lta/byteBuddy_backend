@@ -117,6 +117,29 @@ class UserRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
+    public function getAllUsers(): array
+    {
+        $sql = <<<SQL
+            SELECT
+                *
+            FROM 
+                users
+        SQL;
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            $users = $stmt->fetchAll();
+        } catch (PDOException) {
+            throw new ByteBuddyDatabaseException('Failed to get all users', 500);
+        }
+
+        return $users;
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
     public function userExists(string $email): bool
     {
         $sql = <<<SQL

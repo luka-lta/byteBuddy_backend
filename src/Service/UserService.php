@@ -8,7 +8,6 @@ use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\UserRepository;
 use ByteBuddyApi\Value\Result;
 use ByteBuddyApi\Value\User\User;
-use Exception;
 
 class UserService
 {
@@ -67,5 +66,32 @@ class UserService
         }
 
         return Result::from(true, 'User found', $user->toArray(), 200);
+    }
+
+    // TODO: Add only frontend access
+    public function getAllUsers(): Result
+    {
+        try {
+            $users = $this->userRepository->getAllUsers();
+        } catch (ByteBuddyException $e) {
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
+        }
+
+        return Result::from(true, 'Users found', $users, 200);
+    }
+
+    public function updateUser(User $user, string $token): Result
+    {
+        try {
+            if (!$this->accessService->hasAccess($user->getUserId(), $token)) {
+                return Result::from(false, 'Unauthorized access', null, 403);
+            }
+
+            $this->userRepository->updateUser($user);
+        } catch (ByteBuddyException $e) {
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
+        }
+
+        return Result::from(true, 'User updated successfully', null, 200);
     }
 }

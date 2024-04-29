@@ -12,6 +12,7 @@ use ByteBuddyApi\Action\Command\CommandAction;
 use ByteBuddyApi\Action\Guild\GuildAction;
 use ByteBuddyApi\Action\Health\HealthAction;
 use ByteBuddyApi\Action\User\GetUserAction;
+use ByteBuddyApi\Action\User\UpdateUserAction;
 use ByteBuddyApi\Middleware\AuthMiddleware;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -41,13 +42,14 @@ class Routes
             $group->group('/user', function (RouteCollectorProxy $user) {
                 $user->post('/register', [RegisterAction::class, 'handleRegisterNewUser']);
                 $user->post('/login', [LoginAction::class, 'handleLogin']);
+                $user->get('/all', [GetUserAction::class, 'handleGetAllUserAction']);
 
                 $user->get('/{id:[0-9]+}', [GetUserAction::class, 'handleGetUserAction'])->add(AuthMiddleware::class);
 //                $user->get('/{id:[0-9]+}/roles', [DiscordAuthAction::class, 'handleDiscordAuth']);
 //                $user->post('/{id:[0-9]+}/roles', [DiscordAuthAction::class, 'handleDiscordAuth']);
 //                $user->delete('/{id:[0-9]+}/roles/{roleId:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
 //
-//                $user->put('/{id:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
+                $user->put('/{id:[0-9]+}', [UpdateUserAction::class, 'handleUpdateUserAction']);
 //                $user->delete('/{id:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
 //
 //                $user->get('/{id:[0-9]+}', [DiscordAuthAction::class, 'handleDiscordAuth']);
