@@ -4,20 +4,31 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Value\User;
 
+use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use DateTime;
 use Exception;
 
 class User
 {
+    /**
+     * @throws ByteBuddyValidationException
+     */
     private function __construct(
-        private readonly ?int    $userId,
-        private readonly string $username,
-        private readonly string $email,
-        private ?string          $hashedPassword,
-        private readonly array  $roles,
+        private readonly ?int      $userId,
+        private readonly string    $username,
+        private readonly string    $email,
+        private ?string            $hashedPassword,
+        private readonly string     $role,
         private readonly ?DateTime $createdAt,
         private readonly ?DateTime $updatedAt,
     ) {
+        if ($this->username === '') {
+            throw new ByteBuddyValidationException('Username cannot be empty');
+        }
+
+        if ($this->email === '') {
+            throw new ByteBuddyValidationException('Email cannot be empty');
+        }
     }
 
     public static function from(
@@ -25,7 +36,7 @@ class User
         string $username,
         string $email,
         ?string $hashedPassword,
-        array $roles,
+        string $role,
         ?DateTime $createdAt = null,
         ?DateTime $updatedAt = null,
     ): self {
@@ -34,7 +45,7 @@ class User
             $username,
             $email,
             $hashedPassword,
-            $roles,
+            $role,
             $updatedAt,
             $createdAt,
         );
@@ -52,14 +63,29 @@ class User
             $row['username'],
             $row['email'],
             $row['hashed_password'],
-            explode(',', $row['roles']),
+            $row['role'],
             $createdAt,
             $updatedAt,
             );
     }
 
+    /**
+     * @throws ByteBuddyValidationException
+     */
     public function generatePasswordFromPlain(string $password): void
     {
+        if ($password === '') {
+            throw new ByteBuddyValidationException('Password cannot be empty');
+        }
+
+        if (strlen($password) < 8) {
+            throw new ByteBuddyValidationException('Password must be at least 8 characters long');
+        }
+
+        if (!preg_match('/[A-Z]/', $password)) {
+            throw new ByteBuddyValidationException('Password must contain at least one uppercase letter');
+        }
+
         $this->hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     }
 
@@ -74,7 +100,7 @@ class User
             'userId' => $this->userId,
             'username' => $this->username,
             'email' => $this->email,
-            'roles' => $this->roles,
+            'role' => $this->role,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
         ];
@@ -100,9 +126,9 @@ class User
         return $this->hashedPassword;
     }
 
-    public function getRoles(): array
+    public function getRole(): string
     {
-        return $this->roles;
+        return $this->role;
     }
 
     public function getCreatedAt(): ?DateTime

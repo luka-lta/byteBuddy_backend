@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ByteBuddyApi\Service;
+namespace ByteBuddyApi\Service\Results;
 
 use ByteBuddyApi\Repository\UserRepository;
 
@@ -17,7 +17,7 @@ class AccessService
     private function isAdministrator(int $userId): bool
     {
         $user = $this->userRepository->findUserById($userId);
-        return in_array('ADMIN', $user->getRoles());
+        return $user->getRole() === 'ADMIN';
     }
 
     public function hasAccess(int $ownerId, string $token): bool

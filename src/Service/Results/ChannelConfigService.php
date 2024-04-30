@@ -1,12 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace ByteBuddyApi\Service;
+namespace ByteBuddyApi\Service\Results;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
-use ByteBuddyApi\Exception\ByteBuddyInvalidChannelException;
 use ByteBuddyApi\Repository\ChannelConfigRepository;
-use ByteBuddyApi\Type\ChannelTypes;
 use ByteBuddyApi\Value\Channel;
 use ByteBuddyApi\Value\Result;
 use Exception;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Action\User;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
-use ByteBuddyApi\Service\UserService;
+use ByteBuddyApi\Service\Results\UserService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -26,6 +26,7 @@ class GetUserAction extends ByteBuddyAction
         return $this->buildResponse($response, $result);
     }
 
+    // TODO: Add pagination
     public function handleGetAllUserAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $result = $this->userService->getAllUsers();

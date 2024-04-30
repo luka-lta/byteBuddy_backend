@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ByteBuddyApi\Service;
+namespace ByteBuddyApi\Service\Results;
 
 use ByteBuddyApi\Exception\ByteBuddyTokenException;
 use Exception;

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Middleware;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
-use ByteBuddyApi\Service\JwtService;
+use ByteBuddyApi\Service\Results\JwtService;
+use Firebase\JWT\ExpiredException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -39,6 +40,8 @@ class AuthMiddleware implements MiddlewareInterface
         } catch (ByteBuddyException $e) {
             $message = $e->getMessage();
             $status = $e->getCode();
+        } catch (ExpiredException) {
+            $message = 'Token is expired';
         }
         $resultMessage = [
             'success' => false,

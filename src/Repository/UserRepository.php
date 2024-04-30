@@ -29,7 +29,7 @@ class UserRepository
 
         $sql = <<<SQL
             INSERT INTO 
-                users (username, email, hashed_password, roles)
+                users (username, email, hashed_password, role)
             VALUES 
                 (:username, :email, :hashedPassword, :roles)
         SQL;
@@ -40,7 +40,7 @@ class UserRepository
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
                 'hashedPassword' => $user->getHashedPassword(),
-                'roles' => implode(',', $user->getRoles())
+                'role' => $user->getRole()
             ]);
             $lastId = $this->pdo->lastInsertId();
         } catch (PDOException $e) {
@@ -52,7 +52,7 @@ class UserRepository
             $user->getUsername(),
             $user->getEmail(),
             $user->getHashedPassword(),
-            $user->getRoles(),
+            $user->getRole(),
         );
     }
 
@@ -70,8 +70,7 @@ class UserRepository
             SET 
                 username = :username,
                 email = :email,
-                hashed_password = :hashedPassword,
-                roles = :roles
+                role = :role
             WHERE 
                 user_id = :userId
         SQL;
@@ -82,11 +81,38 @@ class UserRepository
                 'userId' => $user->getUserId(),
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
-                'hashedPassword' => $user->getHashedPassword(),
-                'roles' => $user->getRoles()
+                'role' => $user->getRole()
             ]);
         } catch (PDOException $e) {
             throw new ByteBuddyDatabaseException('Failed to update user', 500, $e);
+        }
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function changePassword(int $userId, string $plainPassword): void
+    {
+        $user = $this->findUserById($userId);
+        $user->generatePasswordFromPlain($plainPassword);
+
+        $sql = <<<SQL
+            UPDATE 
+                users
+            SET 
+                hashed_password = :hashedPassword
+            WHERE 
+                user_id = :userId
+        SQL;
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'userId' => $userId,
+                'hashedPassword' => $user->getHashedPassword()
+            ]);
+        } catch (PDOException $e) {
+            throw new ByteBuddyDatabaseException('Failed to change password', 500, $e);
         }
     }
 
@@ -129,9 +155,15 @@ class UserRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
-            $users = $stmt->fetchAll();
+            $userData = $stmt->fetchAll();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to get all users', 500);
+        }
+
+        $users = [];
+        foreach ($userData as $user) {
+            $userObject = User::fromDatabase($user);
+            $users[] = $userObject->toArray();
         }
 
         return $users;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Action\Channel;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
-use ByteBuddyApi\Service\ChannelConfigService;
+use ByteBuddyApi\Service\Results\ChannelConfigService;
 use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

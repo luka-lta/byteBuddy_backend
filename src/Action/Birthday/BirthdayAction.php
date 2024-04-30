@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Action\Birthday;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
-use ByteBuddyApi\Service\BirthdayService;
+use ByteBuddyApi\Service\Results\BirthdayService;
 use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

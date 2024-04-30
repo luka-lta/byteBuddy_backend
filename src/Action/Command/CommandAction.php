@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Action\Command;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
-use ByteBuddyApi\Service\CommandService;
+use ByteBuddyApi\Service\Results\CommandService;
 use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

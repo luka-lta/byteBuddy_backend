@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ByteBuddyApi\Service;
+namespace ByteBuddyApi\Service\Results;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\UserRepository;
@@ -21,7 +21,7 @@ class UserService
     // TODO: Add validation
     public function registerUser(string $username, string $email, string $password): Result
     {
-        $user = User::from(null, $username, $email, $password, ['USER']);
+        $user = User::from(null, $username, $email, $password, 'USER');
         $user->generatePasswordFromPlain($password);
 
         try {
@@ -93,5 +93,45 @@ class UserService
         }
 
         return Result::from(true, 'User updated successfully', null, 200);
+    }
+
+    public function changePassword(int $userId, string $newPassword, string $oldPassword, string $token): Result
+    {
+        try {
+            if (!$this->accessService->hasAccess($userId, $token)) {
+                return Result::from(false, 'Unauthorized access', null, 403);
+            }
+
+            $user = $this->userRepository->findUserById($userId);
+
+            if ($user->verifyPassword($oldPassword) === false) {
+                return Result::from(false, 'Invalid old password', null, 401);
+            }
+
+            if ($oldPassword === $newPassword) {
+                return Result::from(false, 'New password must be different from old password', null, 400);
+            }
+
+            $this->userRepository->changePassword($userId, $newPassword);
+        } catch (ByteBuddyException $e) {
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
+        }
+
+        return Result::from(true, 'Password changed', null, 200);
+    }
+
+    public function deleteUser(int $userId, string $token): Result
+    {
+        try {
+            if (!$this->accessService->hasAccess($userId, $token)) {
+                return Result::from(false, 'Unauthorized access', null, 403);
+            }
+
+            $this->userRepository->deleteUser($userId);
+        } catch (ByteBuddyException $e) {
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
+        }
+
+        return Result::from(true, 'User deleted', null, 200);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Action\Guild;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
-use ByteBuddyApi\Service\GuildService;
+use ByteBuddyApi\Service\Results\GuildService;
 use ByteBuddyApi\Value\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
