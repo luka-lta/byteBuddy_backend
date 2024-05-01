@@ -17,11 +17,12 @@ class GetUserAction extends ByteBuddyAction
     {
     }
 
-    public function handleGetUserAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
-        $userId = (int)$request->getAttribute('id');
-
-        $result = $this->userService->getUserById($userId, $request->getHeaderLine('Authorization'));
+    public function handleGetUserAction(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $userId
+    ): ResponseInterface {
+        $result = $this->userService->getUserById((int)$userId, $request->getHeaderLine('Authorization'));
 
         return $this->buildResponse($response, $result);
     }
