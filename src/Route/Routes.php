@@ -12,6 +12,7 @@ use ByteBuddyApi\Action\Guild\GuildAction;
 use ByteBuddyApi\Action\Health\HealthAction;
 use ByteBuddyApi\Action\User\DeleteUserAction;
 use ByteBuddyApi\Action\User\GetUserAction;
+use ByteBuddyApi\Action\User\RoleAction;
 use ByteBuddyApi\Action\User\UpdateUserAction;
 use ByteBuddyApi\Middleware\AuthMiddleware;
 use Slim\App;
@@ -46,10 +47,12 @@ class Routes
                 // Get User
                 $user->get('/{userId:[0-9]+}', [GetUserAction::class, 'handleGetUserAction'])->add(AuthMiddleware::class);
                 $user->get('/all', [GetUserAction::class, 'handleGetAllUserAction']);
+                $user->get('/roles/{userId:[0-9]+}', [RoleAction::class, 'handleGetRoleFromUserAction'])->add(AuthMiddleware::class);
 
                 // Update User
                 $user->put('/{userId:[0-9]+}', [UpdateUserAction::class, 'handleUpdateUserAction'])->add(AuthMiddleware::class);
                 $user->put('/changePassword/{userId:[0-9]+}', [UpdateUserAction::class, 'handleChangePasswordAction'])->add(AuthMiddleware::class);
+                $user->put('/roles/{userId:[0-9]+}', [RoleAction::class, 'handleUpdateRoleFromUserAction'])->add(AuthMiddleware::class);
 
                 // Delete User
                 $user->delete('/{id:[0-9]+}', [DeleteUserAction::class, 'handleDeleteUserAction']);
