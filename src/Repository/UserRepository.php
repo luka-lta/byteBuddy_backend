@@ -7,6 +7,7 @@ namespace ByteBuddyApi\Repository;
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Exception\ByteBuddyUserAlreadyExistsException;
 use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
+use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Value\User\User;
 use Exception;
 use PDO;
@@ -84,12 +85,13 @@ class UserRepository
                 'role' => $user->getRole()
             ]);
         } catch (PDOException $e) {
+            var_dump($e->getMessage());
             throw new ByteBuddyDatabaseException('Failed to update user', 500, $e);
         }
     }
 
     /**
-     * @throws ByteBuddyDatabaseException
+     * @throws ByteBuddyDatabaseException|ByteBuddyValidationException
      */
     public function changePassword(int $userId, string $plainPassword): void
     {
