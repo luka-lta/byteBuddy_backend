@@ -18,8 +18,7 @@ class UpdateUserAction extends ByteBuddyAction
     public function __construct(
         private readonly UserService $userService,
         private readonly ValidationService $validationService,
-    )
-    {
+    ) {
     }
 
     public function handleUpdateUserAction(
@@ -28,7 +27,11 @@ class UpdateUserAction extends ByteBuddyAction
         string $userId
     ): ResponseInterface {
         try {
-            $this->validationService->checkForRequiredBodyParams(['username', 'email', 'role'], $request->getParsedBody());
+            $this->validationService->checkForRequiredBodyParams([
+                'username',
+                'email',
+                'role'
+            ], $request->getParsedBody());
             $username = $request->getParsedBody()['username'];
             $email = $request->getParsedBody()['email'];
             $role = $request->getParsedBody()['role'];
@@ -48,11 +51,19 @@ class UpdateUserAction extends ByteBuddyAction
         string $userId
     ): ResponseInterface {
         try {
-            $this->validationService->checkForRequiredBodyParams(['oldPassword', 'newPassword'], $request->getParsedBody());
+            $this->validationService->checkForRequiredBodyParams([
+                'oldPassword',
+                'newPassword'
+            ], $request->getParsedBody());
             $oldPassword = $request->getParsedBody()['oldPassword'];
             $newPassword = $request->getParsedBody()['newPassword'];
 
-            $result = $this->userService->changePassword((int)$userId, $oldPassword, $newPassword, $request->getHeader('Authorization')[0]);
+            $result = $this->userService->changePassword(
+                (int)$userId,
+                $oldPassword,
+                $newPassword,
+                $request->getHeader('Authorization')[0]
+            );
         } catch (ByteBuddyValidationException $e) {
             $result = Result::from(false, $e->getMessage(), null, 400);
         }

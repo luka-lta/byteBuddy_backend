@@ -1,21 +1,18 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Repository;
 
-use ByteBuddyApi\Exception\ByteBuddyCommandAlreadyDisabledException;
 use ByteBuddyApi\Exception\ByteBuddyCommandNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Value\Command;
 use PDO;
 use PDOException;
-use PDOStatement;
 
 class CommandRepository
 {
-    public function __construct(
-        private readonly PDO $pdo
-    )
+    public function __construct(private readonly PDO $pdo)
     {
     }
 
@@ -27,21 +24,15 @@ class CommandRepository
         $insertSql = <<<SQL
         INSERT INTO command_data (name, description, disabled) VALUES (:name, :description, :disabled)
         SQL;
-
         $updateSql = <<<SQL
         UPDATE command_data SET description = :description, disabled = :disabled WHERE name = :name
         SQL;
-
         $insertStmt = $this->pdo->prepare($insertSql);
         $updateStmt = $this->pdo->prepare($updateSql);
-
         $existingCommands = [];
-
-        /** @var Command $command */
+/** @var Command $command */
         foreach ($commands as $command) {
-
             $existingCommands[] = $command->getName();
-
             if ($this->commandExists($command->getName())) {
                 $updateStmt->execute([
                     'name' => $command->getName(),
@@ -75,7 +66,6 @@ class CommandRepository
         $sql = <<<SQL
             DELETE FROM command_data WHERE name = :name
         SQL;
-
         if (!$this->commandExists($name)) {
             throw new ByteBuddyCommandNotFoundException('Command not found', 404);
         }
@@ -99,7 +89,6 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
-
             if ($stmt->rowCount() === 0) {
                 return null;
             }
@@ -121,7 +110,6 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
-
             if ($stmt->rowCount() === 0) {
                 return null;
             }
@@ -143,7 +131,6 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
-
             if ($stmt->rowCount() === 0) {
                 return null;
             }
@@ -167,18 +154,15 @@ class CommandRepository
         $sql = <<<SQL
             UPDATE command_data SET disabled = NOT disabled WHERE id = :id
         SQL;
-
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['id' => $id]);
-
             $statusSql = <<<SQL
             SELECT disabled FROM command_data WHERE id = :id
         SQL;
             $statusStmt = $this->pdo->prepare($statusSql);
             $statusStmt->execute(['id' => $id]);
             $status = $statusStmt->fetchColumn();
-
             return (bool) $status;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
@@ -197,18 +181,15 @@ class CommandRepository
         $sql = <<<SQL
             UPDATE command_data SET disabled = NOT disabled WHERE name = :name
         SQL;
-
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['name' => $name]);
-
             $statusSql = <<<SQL
             SELECT disabled FROM command_data WHERE name = :name
         SQL;
             $statusStmt = $this->pdo->prepare($statusSql);
             $statusStmt->execute(['name' => $name]);
             $status = $statusStmt->fetchColumn();
-
             return (bool) $status;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
@@ -252,9 +233,7 @@ class CommandRepository
     private function deleteObsoleteCommands(array $existingCommands): void
     {
         $placeholders = implode(', ', array_fill(0, count($existingCommands), '?'));
-
         $sql = "DELETE FROM command_data WHERE name NOT IN ($placeholders)";
-
         $deleteStmt = $this->pdo->prepare($sql);
         $deleteStmt->execute($existingCommands);
     }

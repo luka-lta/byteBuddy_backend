@@ -17,8 +17,7 @@ class RoleAction extends ByteBuddyAction
     public function __construct(
         private readonly RoleService $roleService,
         private readonly ValidationService $validationService,
-    )
-    {
+    ) {
     }
 
     public function handleGetRoleFromUserAction(

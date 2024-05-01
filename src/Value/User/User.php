@@ -14,11 +14,11 @@ class User
      * @throws ByteBuddyValidationException
      */
     private function __construct(
-        private readonly ?int      $userId,
-        private readonly string    $username,
-        private readonly string    $email,
-        private ?string            $hashedPassword,
-        private readonly string     $role,
+        private readonly ?int $userId,
+        private readonly string $username,
+        private readonly string $email,
+        private ?string $hashedPassword,
+        private readonly string $role,
         private readonly ?DateTime $createdAt,
         private readonly ?DateTime $updatedAt,
     ) {
@@ -66,7 +66,7 @@ class User
             $row['role'],
             $createdAt,
             $updatedAt,
-            );
+        );
     }
 
     /**

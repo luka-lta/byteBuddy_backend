@@ -21,8 +21,7 @@ class Role
      */
     private function __construct(
         private readonly string $role
-    )
-    {
+    ) {
         if (!in_array($role, $this->validRoles)) {
             throw new ByteBuddyInvalidRoleException(
                 'Invalid role. Please use: [' . implode(', ', $this->validRoles) . ']',

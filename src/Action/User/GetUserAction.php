@@ -13,8 +13,7 @@ class GetUserAction extends ByteBuddyAction
 {
     public function __construct(
         private readonly UserService $userService
-    )
-    {
+    ) {
     }
 
     public function handleGetUserAction(
@@ -28,7 +27,7 @@ class GetUserAction extends ByteBuddyAction
     }
 
     // TODO: Add pagination
-    public function handleGetAllUserAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function handleGetAllUserAction(ResponseInterface $response): ResponseInterface
     {
         $result = $this->userService->getAllUsers();
 

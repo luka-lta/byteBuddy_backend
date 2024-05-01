@@ -1,29 +1,32 @@
 {
-    "name": "luka-lta/byte-buddy_api",
-    "type": "project",
-    "autoload": {
-        "psr-4": {
-            "ByteBuddyApi\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "luka-lta",
-            "email": "luka.lta21@gmail.com"
-        }
-    ],
-    "require": {
-        "php-di/php-di": "^7.0",
-        "php-di/slim-bridge": "^3.4",
-        "slim/slim": "4.*",
-        "ext-pdo": "*",
-        "firebase/php-jwt": "^5.0",
-        "slim/psr7": "^1.6",
-        "nyholm/psr7": "^1.8",
-        "nyholm/psr7-server": "^1.1",
-        "laminas/laminas-diactoros": "^3.3",
-        "monolog/monolog": "^3.5",
-        "wohali/oauth2-discord-new": "^1.2",
-      "ext-http": "*"
+  "name": "luka-lta/byte-buddy_api",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "ByteBuddyApi\\": "src/"
     }
+  },
+  "authors": [
+    {
+      "name": "luka-lta",
+      "email": "luka.lta21@gmail.com"
+    }
+  ],
+  "require": {
+    "php-di/php-di": "^7.0",
+    "php-di/slim-bridge": "^3.4",
+    "slim/slim": "4.*",
+    "ext-pdo": "*",
+    "firebase/php-jwt": "^5.0",
+    "slim/psr7": "^1.6",
+    "nyholm/psr7": "^1.8",
+    "nyholm/psr7-server": "^1.1",
+    "laminas/laminas-diactoros": "^3.3",
+    "monolog/monolog": "^3.5",
+    "wohali/oauth2-discord-new": "^1.2"
+  },
+  "require-dev": {
+    "phpmd/phpmd": "@stable",
+    "squizlabs/php_codesniffer": "3.*"
+  }
 }

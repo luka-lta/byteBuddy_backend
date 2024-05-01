@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Repository;
@@ -10,9 +11,7 @@ use PDOException;
 
 class GuildRepository
 {
-    public function __construct(
-        private readonly PDO $pdo
-    )
+    public function __construct(private readonly PDO $pdo)
     {
     }
 
@@ -24,7 +23,6 @@ class GuildRepository
         $sql = <<<SQL
             INSERT INTO guild_data (guild_id, server_name) VALUES (:guildId, :serverId)
         SQL;
-
         if ($this->guildExists($guildId)) {
             throw new ByteBuddyDatabaseException('Guild already exists', 400);
         }
@@ -48,7 +46,6 @@ class GuildRepository
         $sql = <<<SQL
             SELECT * FROM guild_data WHERE guild_id = $guildId
         SQL;
-
         if (!$this->guildExists($guildId)) {
             throw new ByteBuddyDatabaseException('Guild does not exist', 404);
         }
@@ -56,7 +53,6 @@ class GuildRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
-
             $result = $stmt->fetch();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch config data', 500);
@@ -74,14 +70,12 @@ class GuildRepository
             UPDATE guild_data
             SET $row = :value WHERE guild_id = :guildId
         SQL;
-
         if (!$this->guildExists($guildId)) {
             throw new ByteBuddyDatabaseException('Guild does not exist', 404);
         }
 
         try {
             $stmt = $this->pdo->prepare($sql);
-
             $stmt->execute([
                 'value' => $value,
                 'guildId' => $guildId
@@ -102,7 +96,6 @@ class GuildRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['guildId' => $guildId]);
-
             return $stmt->fetch() !== false;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if guild exists', 500);

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Service\Results;
@@ -11,9 +12,7 @@ use Exception;
 
 class ChannelConfigService
 {
-    public function __construct(
-        private readonly ChannelConfigRepository $channelConfigRepository
-    )
+    public function __construct(private readonly ChannelConfigRepository $channelConfigRepository)
     {
     }
 
@@ -22,30 +21,17 @@ class ChannelConfigService
         try {
             if ($channelType) {
                 $channel = $this->channelConfigRepository->getChannel($guildId, $channelType);
-
-                return Result::from(
-                    true,
-                    'Channel fetched successfully',
-                    $channel->asArray(),
-                    200
-                );
+                return Result::from(true, 'Channel fetched successfully', $channel->asArray(), 200);
             }
 
             $channels = $this->channelConfigRepository->getAllChannels($guildId);
-
             $channelArray = [];
-            /** @var Channel $channel */
+/** @var Channel $channel */
             foreach ($channels as $channel) {
                 $channelArray[] = $channel->asArray();
             }
 
-            return Result::from(
-                true,
-                'Channels fetched successfully',
-                $channelArray,
-                200
-            );
-
+            return Result::from(true, 'Channels fetched successfully', $channelArray, 200);
         } catch (ByteBuddyException $exception) {
             return Result::from(false, $exception->getMessage(), null, $exception->getCode());
         } catch (Exception) {
