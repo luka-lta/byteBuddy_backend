@@ -41,26 +41,27 @@ class Routes
                 $user->post('/register', [RegisterAction::class, 'handleRegisterNewUser']);
                 $user->post('/login', [LoginAction::class, 'handleLogin']);
 
-                // Get User
-                $user->get('/{userId:[0-9]+}', [GetUserAction::class, 'handleGetUserAction'])
-                    ->add(AuthMiddleware::class);
-                $user->get('/all', [GetUserAction::class, 'handleGetAllUserAction']);
-                $user->get('/roles/{userId:[0-9]+}', [RoleAction::class, 'handleGetRoleFromUserAction'])
-                    ->add(AuthMiddleware::class);
-
-                // Update User
-                $user->put('/{userId:[0-9]+}', [UpdateUserAction::class, 'handleUpdateUserAction'])
-                    ->add(AuthMiddleware::class);
+                // Route zum Ändern des Passworts für einen Benutzer
                 $user->put(
                     '/changePassword/{userId:[0-9]+}',
                     [UpdateUserAction::class, 'handleChangePasswordAction']
                 )->add(AuthMiddleware::class);
-                $user->put('/roles/{userId:[0-9]+}', [RoleAction::class, 'handleUpdateRoleFromUserAction'])
-                    ->add(AuthMiddleware::class);
 
-                // Delete User
-                $user->delete('/{id:[0-9]+}', [DeleteUserAction::class, 'handleDeleteUserAction'])
-                    ->add(AuthMiddleware::class);
+                // Route, um alle Benutzer abzurufen
+                $user->get('/all', [GetUserAction::class, 'handleGetAllUserAction']);
+
+                // Gruppe für spezifische Benutzer-IDs
+                $user->group('/{userId:[0-9]+}', function (RouteCollectorProxy $modifyUser) {
+                    $modifyUser->get('', [GetUserAction::class, 'handleGetUserAction']);
+                    $modifyUser->put('', [UpdateUserAction::class, 'handleUpdateUserAction']);
+                    $modifyUser->delete('', [DeleteUserAction::class, 'handleDeleteUserAction']);
+                })->add(AuthMiddleware::class);
+
+                // Gruppe für Benutzerrollen
+                $user->group('/roles', function (RouteCollectorProxy $roles) {
+                    $roles->get('/{userId:[0-9]+}', [RoleAction::class, 'handleGetRoleFromUserAction']);
+                    $roles->put('/{userId:[0-9]+}', [RoleAction::class, 'handleUpdateRoleFromUserAction']);
+                })->add(AuthMiddleware::class);
             });
         });
     }
