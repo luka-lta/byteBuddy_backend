@@ -18,7 +18,10 @@ class ValidationService
         }
 
         if (empty($actualParams)) {
-            throw new ByteBuddyValidationException('No parameters provided please use: [' . implode(', ', $requiredParams) . ']', 400);
+            throw new ByteBuddyValidationException(
+                'No parameters provided please use: [' . implode(', ', $requiredParams) . ']',
+                400
+            );
         }
 
         foreach ($requiredParams as $requiredParam) {

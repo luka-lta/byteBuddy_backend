@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Service\Results;
@@ -11,10 +12,7 @@ use Monolog\Logger;
 
 class CommandService
 {
-    public function __construct(
-        private readonly CommandRepository $commandRepository,
-        private readonly Logger $logger,
-    )
+    public function __construct(private readonly CommandRepository $commandRepository, private readonly Logger $logger,)
     {
     }
 
@@ -22,7 +20,6 @@ class CommandService
     {
         try {
             $commands = [];
-
             foreach ($commandsData as $commandData) {
                 $command = Command::fromArray($commandData);
                 $commands[] = $command;
@@ -50,7 +47,6 @@ class CommandService
     {
         try {
             $result = $this->commandRepository->getAvailableCommands();
-
             if (!$result) {
                 return Result::from(true, 'No available commands', null, 404);
             }
@@ -65,7 +61,6 @@ class CommandService
     {
         try {
             $result = $this->commandRepository->getAllCommands();
-
             if (!$result) {
                 return Result::from(true, 'No commands found', null, 404);
             }
@@ -80,7 +75,6 @@ class CommandService
     {
         try {
             $result = $this->commandRepository->getDisabledCommands();
-
             if (!$result) {
                 return Result::from(true, 'No disabled commands found', null, 404);
             }
@@ -95,9 +89,7 @@ class CommandService
     {
         try {
             $state = $this->commandRepository->toggleCommandById($id);
-
             $message = $state ? 'Command enabled' : 'Command disabled';
-
             return Result::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
             return Result::from(false, $exception->getMessage(), null, $exception->getCode());
@@ -108,9 +100,7 @@ class CommandService
     {
         try {
             $state = $this->commandRepository->toggleCommandByName($name);
-
             $message = $state ? 'Command enabled' : 'Command disabled';
-
             return Result::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
             return Result::from(false, $exception->getMessage(), null, $exception->getCode());

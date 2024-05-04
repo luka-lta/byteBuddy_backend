@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Factory;
@@ -6,11 +7,12 @@ namespace ByteBuddyApi\Factory;
 use ByteBuddyApi\ApplicationConfig;
 use DI\Container;
 use DI\ContainerBuilder;
+use Exception;
 
 class ContainerFactory
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public static function buildContainer(): Container
     {

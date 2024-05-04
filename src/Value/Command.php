@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Value;
@@ -10,7 +11,8 @@ final class Command
         private readonly string $name,
         private readonly string $description,
         private readonly bool $disabled,
-    ) {}
+    ) {
+    }
 
     public static function from(int $id, string $name, string $descrption, bool $disabled): self
     {

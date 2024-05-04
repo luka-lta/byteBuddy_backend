@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Value;
@@ -14,8 +15,7 @@ final class Channel
     private function __construct(
         private readonly string $channelId,
         private readonly string $channelType,
-    )
-    {
+    ) {
         if (!in_array($channelType, ChannelTypes::getAllChannelTypes())) {
             throw new ByteBuddyInvalidChannelException('Invalid channel type', 400);
         }
@@ -27,8 +27,7 @@ final class Channel
     public static function from(
         string $channelId,
         string $channelType,
-    ): self
-    {
+    ): self {
         return new self($channelId, $channelType);
     }
 
@@ -38,8 +37,7 @@ final class Channel
     public static function fromDatabase(
         array  $data,
         string $channelType,
-    ): self
-    {
+    ): self {
         return new self(
             $data['channel_id'],
             $channelType,

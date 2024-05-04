@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Value;
@@ -11,8 +12,7 @@ final class BirthdayObject
         private readonly string $guildId,
         private readonly string $userId,
         private readonly DateTime $birthday
-    )
-    {
+    ) {
     }
 
     public static function from(string $guildId, string $userId, DateTime $birthday): self

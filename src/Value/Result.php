@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Value;
@@ -10,7 +11,8 @@ final class Result
         private readonly string $message,
         private readonly mixed $data,
         private readonly int $statusCode,
-    ) {}
+    ) {
+    }
 
     public static function from(bool $success, string $message, mixed $data, int $statusCode): self
     {

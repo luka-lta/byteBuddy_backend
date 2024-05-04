@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Repository;
@@ -13,8 +14,7 @@ class BirthdayRepository
     public function __construct(
         private readonly PDO $pdo,
         private readonly GuildRepository $guildRepository,
-    )
-    {
+    ) {
     }
 
     /**
