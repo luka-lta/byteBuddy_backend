@@ -31,6 +31,9 @@ class User
         }
     }
 
+    /**
+     * @throws ByteBuddyValidationException
+     */
     public static function from(
         ?int $userId,
         string $username,
@@ -52,12 +55,17 @@ class User
     }
 
     /**
-     * @throws Exception
+     * @throws ByteBuddyValidationException
      */
     public static function fromDatabase(array $row): self
     {
-        $createdAt = $row['created_at'] ? new DateTime($row['created_at']) : null;
-        $updatedAt = $row['updated_at'] ? new DateTime($row['updated_at']) : null;
+        try {
+            $createdAt = $row['created_at'] ? new DateTime($row['created_at']) : null;
+            $updatedAt = $row['updated_at'] ? new DateTime($row['updated_at']) : null;
+        } catch (Exception $e) {
+            throw new ByteBuddyValidationException('Invalid date format');
+        }
+
         return new self(
             $row['user_id'],
             $row['username'],

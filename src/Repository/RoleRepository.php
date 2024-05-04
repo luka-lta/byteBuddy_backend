@@ -6,6 +6,8 @@ namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Exception\ByteBuddyInvalidRoleException;
+use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
+use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Value\User\Role;
 use PDO;
 use PDOException;
@@ -19,8 +21,10 @@ class RoleRepository
     }
 
     /**
-     * @throws ByteBuddyDatabaseException
      * @throws ByteBuddyInvalidRoleException
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyDatabaseException
+     * @throws ByteBuddyUserNotFoundException
      */
     public function getRoleFromUserId(int $userId): Role
     {
@@ -43,7 +47,10 @@ class RoleRepository
         return Role::from($role);
     }
 
+
     /**
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyUserNotFoundException
      * @throws ByteBuddyDatabaseException
      */
     public function updateRoleFromUser(int $userId, Role $role): void

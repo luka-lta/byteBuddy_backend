@@ -9,7 +9,6 @@ use ByteBuddyApi\Exception\ByteBuddyUserAlreadyExistsException;
 use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Value\User\User;
-use Exception;
 use PDO;
 use PDOException;
 
@@ -20,7 +19,9 @@ class UserRepository
     }
 
     /**
-     * @throws Exception
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyUserAlreadyExistsException
+     * @throws ByteBuddyDatabaseException
      */
     public function createUser(User $user): User
     {
@@ -58,8 +59,9 @@ class UserRepository
     }
 
     /**
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyUserNotFoundException
      * @throws ByteBuddyDatabaseException
-     * @throws Exception
      */
     public function updateUser(User $user): void
     {
@@ -90,8 +92,11 @@ class UserRepository
         }
     }
 
+
     /**
-     * @throws ByteBuddyDatabaseException|ByteBuddyValidationException
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyDatabaseException
+     * @throws ByteBuddyUserNotFoundException
      */
     public function changePassword(int $userId, string $plainPassword): void
     {
@@ -119,6 +124,8 @@ class UserRepository
     }
 
     /**
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyUserNotFoundException
      * @throws ByteBuddyDatabaseException
      */
     public function deleteUser(int $userId): void
@@ -143,6 +150,7 @@ class UserRepository
     }
 
     /**
+     * @throws ByteBuddyValidationException
      * @throws ByteBuddyDatabaseException
      */
     public function getAllUsers(): array
@@ -200,7 +208,9 @@ class UserRepository
     }
 
     /**
-     * @throws Exception
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyDatabaseException
+     * @throws ByteBuddyUserNotFoundException
      */
     public function findUserByEmail(string $email): User
     {
@@ -233,7 +243,7 @@ class UserRepository
 
     /**
      * @throws ByteBuddyDatabaseException
-     * @throws Exception
+     * @throws ByteBuddyValidationException|ByteBuddyUserNotFoundException
      */
     public function findUserById(int $userId): ?User
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Service\Results\User;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
+use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Repository\UserRepository;
 use ByteBuddyApi\Service\AccessService;
 use ByteBuddyApi\Service\JwtService;
@@ -21,6 +22,9 @@ class UserService
     }
 
     // TODO: Add validation
+    /**
+     * @throws ByteBuddyValidationException
+     */
     public function registerUser(string $username, string $email, string $password): Result
     {
         $user = User::from(null, $username, $email, $password, 'USER');
