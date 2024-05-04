@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Action\User;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
-use ByteBuddyApi\Service\Results\UserService;
+use ByteBuddyApi\Service\Results\User\UserService;
 use ByteBuddyApi\Value\User\User;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

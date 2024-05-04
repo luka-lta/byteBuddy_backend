@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ByteBuddyApi\Service\Results;
+namespace ByteBuddyApi\Service\Results\User;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\UserRepository;
+use ByteBuddyApi\Service\Results\AccessService;
+use ByteBuddyApi\Service\Results\JwtService;
 use ByteBuddyApi\Value\Result;
 use ByteBuddyApi\Value\User\User;
 
