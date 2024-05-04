@@ -21,7 +21,7 @@ class DeleteUserAction extends ByteBuddyAction
         ResponseInterface $response,
         string $userId
     ): ResponseInterface {
-        $result = $this->userService->deleteUser((int)$userId, $request->getHeader('Authorization')[0]);
+        $result = $this->userService->deleteUser((int)$userId, $request->getAttribute('decodedToken')['uid']);
         return $this->buildResponse($response, $result);
     }
 }
