@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ByteBuddyApi\Service\Results;
+namespace ByteBuddyApi\Service;
 
 use ByteBuddyApi\Exception\ByteBuddyTokenException;
 use Exception;
@@ -70,5 +70,14 @@ class JwtService
             'uid' => $decoded->uid,
             'name' => $decoded->name,
         ];
+    }
+
+    /**
+     * @throws ByteBuddyTokenException
+     */
+    public function validateAndDecodeToken(array|string $token): array
+    {
+        $this->validateToken($token);
+        return $this->getUserDataFromToken($token);
     }
 }

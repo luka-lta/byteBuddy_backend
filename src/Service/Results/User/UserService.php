@@ -6,8 +6,8 @@ namespace ByteBuddyApi\Service\Results\User;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Repository\UserRepository;
-use ByteBuddyApi\Service\Results\AccessService;
-use ByteBuddyApi\Service\Results\JwtService;
+use ByteBuddyApi\Service\AccessService;
+use ByteBuddyApi\Service\JwtService;
 use ByteBuddyApi\Value\Result;
 use ByteBuddyApi\Value\User\User;
 
@@ -55,13 +55,13 @@ class UserService
         ], 200);
     }
 
-    public function getUserById(int $userId, string $token): Result
+    public function getUserById(int $userId, int $requestUser): Result
     {
         try {
             $user = $this->userRepository->findUserById($userId);
 
-            if (!$this->accessService->hasAccess($userId, $token)) {
-                return Result::from(false, 'Unauthorized access', null, 403);
+            if (!$this->accessService->hasAccess($userId, $requestUser)) {
+                return Result::from(false, 'Unauthorized access', null, 401);
             }
         } catch (ByteBuddyException $e) {
             return Result::from(false, $e->getMessage(), null, $e->getCode());
@@ -82,11 +82,11 @@ class UserService
         return Result::from(true, 'Users found', $users, 200);
     }
 
-    public function updateUser(User $user, string $token): Result
+    public function updateUser(User $user, int $accessUserId): Result
     {
         try {
-            if (!$this->accessService->hasAccess($user->getUserId(), $token)) {
-                return Result::from(false, 'Unauthorized access', null, 403);
+            if (!$this->accessService->hasAccess($user->getUserId(), $accessUserId)) {
+                return Result::from(false, 'Forbidden', null, 403);
             }
 
             $this->userRepository->updateUser($user);
@@ -97,11 +97,11 @@ class UserService
         return Result::from(true, 'User updated successfully', null, 200);
     }
 
-    public function changePassword(int $userId, string $newPassword, string $oldPassword, string $token): Result
+    public function changePassword(int $userId, string $newPassword, string $oldPassword, int $accessUserId): Result
     {
         try {
-            if (!$this->accessService->hasAccess($userId, $token)) {
-                return Result::from(false, 'Unauthorized access', null, 403);
+            if (!$this->accessService->hasAccess($userId, $accessUserId)) {
+                return Result::from(false, 'Forbidden', null, 403);
             }
 
             $user = $this->userRepository->findUserById($userId);
@@ -122,11 +122,11 @@ class UserService
         return Result::from(true, 'Password changed', null, 200);
     }
 
-    public function deleteUser(int $userId, string $token): Result
+    public function deleteUser(int $userId, int $accessUserId): Result
     {
         try {
-            if (!$this->accessService->hasAccess($userId, $token)) {
-                return Result::from(false, 'Unauthorized access', null, 403);
+            if (!$this->accessService->hasAccess($userId, $accessUserId)) {
+                return Result::from(false, 'Forbidden', null, 403);
             }
 
             $this->userRepository->deleteUser($userId);

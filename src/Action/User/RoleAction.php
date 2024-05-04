@@ -25,11 +25,10 @@ class RoleAction extends ByteBuddyAction
         ResponseInterface $response,
         string $userId
     ): ResponseInterface {
-        $result = $this->roleService->getRoleFromUser((int) $userId);
+        $result = $this->roleService->getRoleFromUser((int) $userId, $request->getAttribute('decodedToken')['uid']);
         return $this->buildResponse($response, $result);
     }
 
-    // TODO: Add authentication
     public function handleUpdateRoleFromUserAction(
         ServerRequestInterface $request,
         ResponseInterface $response,
@@ -37,7 +36,11 @@ class RoleAction extends ByteBuddyAction
     ): ResponseInterface {
         try {
             $this->validationService->checkForRequiredBodyParams(['role'], $request->getParsedBody());
-            $result = $this->roleService->updateRoleFromUser((int) $userId, $request->getParsedBody()['role']);
+            $result = $this->roleService->updateRoleFromUser(
+                (int) $userId,
+                $request->getParsedBody()['role'],
+                $request->getAttribute('decodedToken')['uid']
+            );
         } catch (ByteBuddyValidationException $e) {
             $result = Result::from(false, $e->getMessage(), null, $e->getCode());
         }

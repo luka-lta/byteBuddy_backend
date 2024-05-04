@@ -37,7 +37,7 @@ class UpdateUserAction extends ByteBuddyAction
             $role = $request->getParsedBody()['role'];
 
             $updatedUser = User::from((int)$userId, $username, $email, null, $role);
-            $result = $this->userService->updateUser($updatedUser, $request->getHeader('Authorization')[0]);
+            $result = $this->userService->updateUser($updatedUser, $request->getAttribute('decodedToken')['uid']);
         } catch (ByteBuddyValidationException $e) {
             $result = Result::from(false, $e->getMessage(), null, 400);
         }
@@ -62,7 +62,7 @@ class UpdateUserAction extends ByteBuddyAction
                 (int)$userId,
                 $oldPassword,
                 $newPassword,
-                $request->getHeader('Authorization')[0]
+                $request->getAttribute('decodedToken')['uid']
             );
         } catch (ByteBuddyValidationException $e) {
             $result = Result::from(false, $e->getMessage(), null, 400);

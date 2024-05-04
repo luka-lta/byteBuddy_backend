@@ -40,13 +40,15 @@ class Routes
 
                 $user->post('/register', [RegisterAction::class, 'handleRegisterNewUser']);
                 $user->post('/login', [LoginAction::class, 'handleLogin']);
-            // Get User
+
+                // Get User
                 $user->get('/{userId:[0-9]+}', [GetUserAction::class, 'handleGetUserAction'])
                     ->add(AuthMiddleware::class);
                 $user->get('/all', [GetUserAction::class, 'handleGetAllUserAction']);
                 $user->get('/roles/{userId:[0-9]+}', [RoleAction::class, 'handleGetRoleFromUserAction'])
                     ->add(AuthMiddleware::class);
-            // Update User
+
+                // Update User
                 $user->put('/{userId:[0-9]+}', [UpdateUserAction::class, 'handleUpdateUserAction'])
                     ->add(AuthMiddleware::class);
                 $user->put(
@@ -55,8 +57,10 @@ class Routes
                 )->add(AuthMiddleware::class);
                 $user->put('/roles/{userId:[0-9]+}', [RoleAction::class, 'handleUpdateRoleFromUserAction'])
                     ->add(AuthMiddleware::class);
-            // Delete User
-                $user->delete('/{id:[0-9]+}', [DeleteUserAction::class, 'handleDeleteUserAction']);
+
+                // Delete User
+                $user->delete('/{id:[0-9]+}', [DeleteUserAction::class, 'handleDeleteUserAction'])
+                    ->add(AuthMiddleware::class);
             });
         });
     }

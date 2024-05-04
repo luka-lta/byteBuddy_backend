@@ -21,7 +21,7 @@ class GetUserAction extends ByteBuddyAction
         ResponseInterface $response,
         string $userId
     ): ResponseInterface {
-        $result = $this->userService->getUserById((int)$userId, $request->getHeaderLine('Authorization'));
+        $result = $this->userService->getUserById((int)$userId, $request->getAttribute('decodedToken')['uid']);
 
         return $this->buildResponse($response, $result);
     }
