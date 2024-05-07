@@ -100,7 +100,7 @@ class CommandService
     {
         try {
             $state = $this->commandRepository->toggleCommandByName($name);
-            $message = $state ? 'Command enabled' : 'Command disabled';
+            $message = $state ? 'Command disabled' : 'Command enabled';
             return Result::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
             return Result::from(false, $exception->getMessage(), null, $exception->getCode());
