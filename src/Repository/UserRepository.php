@@ -46,7 +46,11 @@ class UserRepository
             ]);
             $lastId = $this->pdo->lastInsertId();
         } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException('Failed to create user', 500, $e);
+            throw new ByteBuddyDatabaseException(
+                'Failed to create user',
+                500, $user->toArray(),
+                $e
+            );
         }
 
         return User::from(
@@ -200,8 +204,10 @@ class UserRepository
             ]);
 
             $count = $stmt->fetchColumn();
-        } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to check if user exists', 500);
+        } catch (PDOException $e) {
+            throw new ByteBuddyDatabaseException('Failed to check if user exists', 500, [
+                'email' => $email
+            ], $e);
         }
 
         return $count > 0;
@@ -230,12 +236,16 @@ class UserRepository
             ]);
 
             $user = $stmt->fetch();
-        } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to find user by email', 500);
+        } catch (PDOException $e) {
+            throw new ByteBuddyDatabaseException('Failed to find user by email', 500, [
+                'email' => $email
+            ], $e);
         }
 
         if ($user === false) {
-            throw new ByteBuddyUserNotFoundException('User not found', 404);
+            throw new ByteBuddyUserNotFoundException('User not found', 404, [
+                'email' => $email
+            ]);
         }
 
         return User::fromDatabase($user);
@@ -263,12 +273,16 @@ class UserRepository
             ]);
 
             $user = $stmt->fetch();
-        } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to find user by id', 500);
+        } catch (PDOException $e) {
+            throw new ByteBuddyDatabaseException('Failed to find user by id', 500, [
+                'userId' => $userId
+            ], $e);
         }
 
         if ($user === false) {
-            throw new ByteBuddyUserNotFoundException('User not found', 404);
+            throw new ByteBuddyUserNotFoundException('User not found', 404, [
+                'userId' => $userId
+            ]);
         }
 
         return User::fromDatabase($user);

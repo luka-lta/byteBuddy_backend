@@ -8,6 +8,7 @@ use ByteBuddyApi\Exception\ByteBuddyException;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Repository\UserRepository;
 use ByteBuddyApi\Service\AccessService;
+use ByteBuddyApi\Service\ExceptionService;
 use ByteBuddyApi\Service\JwtService;
 use ByteBuddyApi\Value\Result;
 use ByteBuddyApi\Value\User\User;
@@ -18,6 +19,7 @@ class UserService
         private readonly UserRepository $userRepository,
         private readonly JwtService $jwtService,
         private readonly AccessService $accessService,
+        private readonly ExceptionService $exceptionService,
     ) {
     }
 
@@ -33,6 +35,7 @@ class UserService
         try {
             $this->userRepository->createUser($user);
         } catch (ByteBuddyException $e) {
+            $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());
         }
 
@@ -50,6 +53,7 @@ class UserService
                 return Result::from(false, 'Invalid password', null, 401);
             }
         } catch (ByteBuddyException $e) {
+            $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());
         }
 
@@ -68,6 +72,7 @@ class UserService
                 return Result::from(false, 'Unauthorized access', null, 401);
             }
         } catch (ByteBuddyException $e) {
+            $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());
         }
 
@@ -80,6 +85,7 @@ class UserService
         try {
             $users = $this->userRepository->getAllUsers();
         } catch (ByteBuddyException $e) {
+            $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());
         }
 
@@ -95,6 +101,7 @@ class UserService
 
             $this->userRepository->updateUser($user);
         } catch (ByteBuddyException $e) {
+            $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());
         }
 
@@ -120,6 +127,7 @@ class UserService
 
             $this->userRepository->changePassword($userId, $newPassword);
         } catch (ByteBuddyException $e) {
+            $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());
         }
 
@@ -135,6 +143,7 @@ class UserService
 
             $this->userRepository->deleteUser($userId);
         } catch (ByteBuddyException $e) {
+            $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());
         }
 

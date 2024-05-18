@@ -33,9 +33,13 @@ class Routes
             $group->get('/channels', [ChannelConfigAction::class, 'handleGetChannels']);
             $group->get('/birthdays', [BirthdayAction::class, 'handleGetBirthdaysFromGuildAction']);
             $group->post('/birthdays', [BirthdayAction::class, 'handleSetOrUpdateBirthdaysAction']);
-            $group->get('/commands', [CommandAction::class, 'handleGetCommandsAction']);
-            $group->post('/commands/toggle', [CommandAction::class, 'handleToggleCommand']);
-            $group->post('/commands/register', [CommandAction::class, 'handleRegisterCommandAction']);
+
+            $group->group('/commands', function (RouteCollectorProxy $commands) {
+                $commands->get('', [CommandAction::class, 'handleGetCommandsAction']);
+                $commands->post('/toggle', [CommandAction::class, 'handleToggleCommand']);
+                $commands->post('/register', [CommandAction::class, 'handleRegisterCommandAction']);
+            });
+
             $group->group('/user', function (RouteCollectorProxy $user) {
 
                 $user->post('/register', [RegisterAction::class, 'handleRegisterNewUser']);

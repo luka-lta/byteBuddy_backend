@@ -114,10 +114,18 @@ class CommandRepository
                 return null;
             }
 
-            return $stmt->fetchAll();
+            $commandsData = $stmt->fetchAll();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to get all commands', 500);
         }
+
+        $commands = [];
+        foreach ($commandsData as $command) {
+            $userObject = Command::fromDatabase($command);
+            $commands[] = $userObject->toArray();
+        }
+
+        return $commands;
     }
 
     /**
@@ -216,14 +224,14 @@ class CommandRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function commandExistsById(int $id): bool
+    public function commandExistsById(int $commmandId): bool
     {
         $sql = <<<SQL
             SELECT * FROM command_data WHERE id = :id
         SQL;
         try {
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['id' => $id]);
+            $stmt->execute(['id' => $commmandId]);
             return $stmt->rowCount() > 0;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if command exists', 500);

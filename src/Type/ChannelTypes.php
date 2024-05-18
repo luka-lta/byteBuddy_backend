@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Type;
@@ -8,7 +9,6 @@ class ChannelTypes
     public const WELCOME_CHANNEL = 'welcome';
     public const LEAVE_CHANNEL = 'leave';
     public const BIRTHDAY_CHANNEL = 'birthday';
-
     public static function getAllChannelTypes(): array
     {
         return [

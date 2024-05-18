@@ -15,8 +15,10 @@ class CommandAction extends ByteBuddyAction
     {
     }
 
-    public function handleRegisterCommandAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
+    public function handleRegisterCommandAction(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ): ResponseInterface {
         $commandData = $request->getParsedBody();
 
         if ($commandData === null) {
@@ -28,8 +30,10 @@ class CommandAction extends ByteBuddyAction
         return $this->buildResponse($response, $result);
     }
 
-    public function handleGetCommandsAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
+    public function handleGetCommandsAction(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ): ResponseInterface {
         if (isset($request->getQueryParams()['status'])) {
             switch ($request->getQueryParams()['status']) {
                 case 'enabled':

@@ -10,21 +10,25 @@ use ByteBuddyApi\Service\Results\User\UserService;
 use ByteBuddyApi\Service\ValidationService;
 use ByteBuddyApi\Value\Result;
 use ByteBuddyApi\Value\User\User;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 class UpdateUserAction extends ByteBuddyAction
 {
     public function __construct(
-        private readonly UserService $userService,
+        private readonly UserService       $userService,
         private readonly ValidationService $validationService,
-    ) {
+        private readonly Logger            $logger,
+    )
+    {
     }
 
     public function handleUpdateUserAction(
         ServerRequestInterface $request,
-        ResponseInterface $response,
-        string $userId
+        ResponseInterface      $response,
+        string                 $userId
     ): ResponseInterface {
         try {
             $this->validationService->checkForRequiredBodyParams([
@@ -40,6 +44,9 @@ class UpdateUserAction extends ByteBuddyAction
             $result = $this->userService->updateUser($updatedUser, $request->getAttribute('decodedToken')['uid']);
         } catch (ByteBuddyValidationException $e) {
             $result = Result::from(false, $e->getMessage(), null, 400);
+        } catch (Throwable $e) {
+            $this->logger->error($e->getMessage());
+            $result = Result::from(false, 'Failed to update user', null, 500);
         }
 
         return $this->buildResponse($response, $result);
@@ -47,9 +54,10 @@ class UpdateUserAction extends ByteBuddyAction
 
     public function handleChangePasswordAction(
         ServerRequestInterface $request,
-        ResponseInterface $response,
-        string $userId
-    ): ResponseInterface {
+        ResponseInterface      $response,
+        string                 $userId
+    ): ResponseInterface
+    {
         try {
             $this->validationService->checkForRequiredBodyParams([
                 'oldPassword',
@@ -66,6 +74,9 @@ class UpdateUserAction extends ByteBuddyAction
             );
         } catch (ByteBuddyValidationException $e) {
             $result = Result::from(false, $e->getMessage(), null, 400);
+        }  catch (Throwable $e) {
+            $this->logger->error($e->getMessage());
+            $result = Result::from(false, 'Failed to change password', null, 500);
         }
 
         return $this->buildResponse($response, $result);

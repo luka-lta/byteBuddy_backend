@@ -7,16 +7,26 @@ namespace ByteBuddyApi\Value;
 final class Command
 {
     private function __construct(
-        private readonly ?int $id,
+        private readonly ?int   $commandId,
         private readonly string $name,
         private readonly string $description,
-        private readonly bool $disabled,
+        private readonly bool   $disabled,
     ) {
     }
 
-    public static function from(int $id, string $name, string $descrption, bool $disabled): self
+    public static function from(int $commandId, string $name, string $descrption, bool $disabled): self
     {
-        return new self($id, $name, $descrption, $disabled);
+        return new self($commandId, $name, $descrption, $disabled);
+    }
+
+    public static function fromDatabase(array $rows): self
+    {
+        return new self(
+            (int)$rows['id'],
+            $rows['name'],
+            $rows['description'],
+            (bool)$rows['disabled']
+        );
     }
 
     public static function fromArray(array $data): self
@@ -29,9 +39,19 @@ final class Command
         );
     }
 
-    public function getId(): int
+    public function toArray(): array
     {
-        return $this->id;
+        return [
+            'id' => $this->commandId,
+            'name' => $this->name,
+            'description' => $this->description,
+            'disabled' => $this->disabled
+        ];
+    }
+
+    public function getCommandId(): int
+    {
+        return $this->commandId;
     }
 
     public function getName(): string
