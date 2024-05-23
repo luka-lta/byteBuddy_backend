@@ -66,7 +66,7 @@ class RoleRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                'role' => $role->getRole(),
+                'role' => $role->getValue(),
                 'userId' => $userId,
             ]);
         } catch (PDOException $e) {

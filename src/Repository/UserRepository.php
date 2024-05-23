@@ -7,6 +7,7 @@ namespace ByteBuddyApi\Repository;
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Utils\PdoUtil;
+use ByteBuddyApi\Value\User\Password;
 use ByteBuddyApi\Value\User\User;
 
 class UserRepository
@@ -31,9 +32,9 @@ class UserRepository
 
         try {
             $this->pdo->execute($sql, [
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'hashedPassword' => $user->getHashedPassword(),
+                'username' => $user->getUsername()->getValue(),
+                'email' => $user->getEmail()->getValue(),
+                'hashedPassword' => $user->getPassword()->getValue(),
             ]);
             $lastId = $this->pdo->getLastInsertedId();
         } catch (ByteBuddyDatabaseException $e) {
@@ -47,10 +48,10 @@ class UserRepository
 
         return User::from(
             $lastId,
-            $user->getUsername(),
-            $user->getEmail(),
-            $user->getHashedPassword(),
-            $user->getRole(),
+            $user->getUsername()->getValue(),
+            $user->getEmail()->getValue(),
+            $user->getPassword()->getValue(),
+            $user->getRole()->getValue(),
         );
     }
 
@@ -73,9 +74,9 @@ class UserRepository
         try {
             $this->pdo->executeUpdate($sql, [
                 'userId' => $user->getUserId(),
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'role' => $user->getRole()
+                'username' => $user->getUsername()->getValue(),
+                'email' => $user->getEmail()->getValue(),
+                'role' => $user->getRole()->getValue()
             ]);
         } catch (ByteBuddyDatabaseException $e) {
             throw new ByteBuddyDatabaseException('Failed to update user', 500, $e);
@@ -86,7 +87,7 @@ class UserRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function changePassword(int $userId, string $hashedPassword): void
+    public function changePassword(int $userId, Password $hashedPassword): void
     {
         $sql = <<<SQL
             UPDATE 
@@ -100,7 +101,7 @@ class UserRepository
         try {
             $this->pdo->execute($sql, [
                 'userId' => $userId,
-                'hashedPassword' => $hashedPassword
+                'hashedPassword' => $hashedPassword->getValue()
             ]);
         } catch (ByteBuddyDatabaseException $e) {
             throw new ByteBuddyDatabaseException('Failed to change password', 500, $e);

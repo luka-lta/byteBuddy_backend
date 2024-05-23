@@ -41,7 +41,7 @@ class UserService
         }
 
         $user = User::from(null, $username, $email, $password, 'USER');
-        $user->generatePasswordFromPlain($password);
+        $user->getPassword()->generatePasswordFromPlain($password);
 
         return $this->userRepository->createUser($user);
     }
@@ -54,9 +54,9 @@ class UserService
     public function loginUser(string $email, string $password): array
     {
         $user = $this->getUserByEmail($email);
-        $token = $this->jwtService->generateNewToken($user->getUserId(), $user->getUsername());
+        $token = $this->jwtService->generateNewToken($user->getUserId(), $user->getUsername()->getValue());
 
-        if (!$user->verifyPassword($password)) {
+        if (!$user->getPassword()->verify($password)) {
             throw new ByteBuddyValidationException(
                 'Invalid password',
                 400
@@ -103,15 +103,15 @@ class UserService
     {
         $user = $this->getUserById($userId);
 
-        if (!$user->verifyPassword($newPassword)) {
+        if (!$user->getPassword()->verify($newPassword)) {
             throw new ByteBuddyValidationException(
                 'Invalid old password',
                 400
             );
         }
 
-        $user->generatePasswordFromPlain($newPassword);
-        $this->userRepository->changePassword($userId, $user->getHashedPassword());
+        $user->getPassword()->generatePasswordFromPlain($newPassword);
+        $this->userRepository->changePassword($userId, $user->getPassword());
     }
 
     /**

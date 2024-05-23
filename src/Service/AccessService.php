@@ -23,7 +23,7 @@ class AccessService
     private function isAdministrator(int $accessUserId): bool
     {
         $user = $this->userService->getUserById($accessUserId);
-        return $user->getRole() === 'ADMIN';
+        return $user->getRole()->getValue() === 'ADMIN';
     }
 
     /**

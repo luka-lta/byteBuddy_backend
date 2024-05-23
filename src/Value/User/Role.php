@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Value\User;
 
-use ByteBuddyApi\Exception\ByteBuddyInvalidRoleException;
+use ByteBuddyApi\Exception\ByteBuddyValidationException;
 
 class Role
 {
@@ -17,13 +17,13 @@ class Role
     ];
 
     /**
-     * @throws ByteBuddyInvalidRoleException
+     * @throws ByteBuddyValidationException
      */
     private function __construct(
         private readonly string $role
     ) {
         if (!in_array($role, $this->validRoles)) {
-            throw new ByteBuddyInvalidRoleException(
+            throw new ByteBuddyValidationException(
                 'Invalid role. Please use: [' . implode(', ', $this->validRoles) . ']',
                 400
             );
@@ -31,7 +31,7 @@ class Role
     }
 
     /**
-     * @throws ByteBuddyInvalidRoleException
+     * @throws ByteBuddyValidationException
      */
     public static function from(string $role): self
     {
@@ -45,7 +45,7 @@ class Role
         ];
     }
 
-    public function getRole(): string
+    public function getValue(): string
     {
         return $this->role;
     }
