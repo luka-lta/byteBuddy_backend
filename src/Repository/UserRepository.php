@@ -5,56 +5,48 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
-use ByteBuddyApi\Exception\ByteBuddyUserAlreadyExistsException;
-use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
+use ByteBuddyApi\Utils\PdoUtil;
 use ByteBuddyApi\Value\User\User;
-use PDO;
-use PDOException;
 
 class UserRepository
 {
-    public function __construct(private readonly PDO $pdo)
-    {
+    public function __construct(
+        private readonly PdoUtil $pdo,
+    ) {
     }
 
     /**
      * @throws ByteBuddyValidationException
-     * @throws ByteBuddyUserAlreadyExistsException
      * @throws ByteBuddyDatabaseException
      */
     public function createUser(User $user): User
     {
-        if ($this->userExists($user->getEmail())) {
-            throw new ByteBuddyUserAlreadyExistsException('User with this email already exists', 409);
-        }
-
         $sql = <<<SQL
             INSERT INTO 
-                users (username, email, hashed_password, role)
+                users (username, email, hashed_password)
             VALUES 
-                (:username, :email, :hashedPassword, :roles)
+                (:username, :email, :hashedPassword)
         SQL;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
+            $this->pdo->execute($sql, [
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
                 'hashedPassword' => $user->getHashedPassword(),
-                'role' => $user->getRole()
             ]);
-            $lastId = $this->pdo->lastInsertId();
-        } catch (PDOException $e) {
+            $lastId = $this->pdo->getLastInsertedId();
+        } catch (ByteBuddyDatabaseException $e) {
             throw new ByteBuddyDatabaseException(
                 'Failed to create user',
-                500, $user->toArray(),
+                500,
+                $user->toArray(),
                 $e
             );
         }
 
         return User::from(
-            (int)$lastId,
+            $lastId,
             $user->getUsername(),
             $user->getEmail(),
             $user->getHashedPassword(),
@@ -63,14 +55,10 @@ class UserRepository
     }
 
     /**
-     * @throws ByteBuddyValidationException
-     * @throws ByteBuddyUserNotFoundException
      * @throws ByteBuddyDatabaseException
      */
     public function updateUser(User $user): void
     {
-        $this->findUserById($user->getUserId());
-
         $sql = <<<SQL
             UPDATE 
                 users
@@ -83,30 +71,23 @@ class UserRepository
         SQL;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
+            $this->pdo->executeUpdate($sql, [
                 'userId' => $user->getUserId(),
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
                 'role' => $user->getRole()
             ]);
-        } catch (PDOException $e) {
-            var_dump($e->getMessage());
+        } catch (ByteBuddyDatabaseException $e) {
             throw new ByteBuddyDatabaseException('Failed to update user', 500, $e);
         }
     }
 
 
     /**
-     * @throws ByteBuddyValidationException
      * @throws ByteBuddyDatabaseException
-     * @throws ByteBuddyUserNotFoundException
      */
-    public function changePassword(int $userId, string $plainPassword): void
+    public function changePassword(int $userId, string $hashedPassword): void
     {
-        $user = $this->findUserById($userId);
-        $user->generatePasswordFromPlain($plainPassword);
-
         $sql = <<<SQL
             UPDATE 
                 users
@@ -117,25 +98,20 @@ class UserRepository
         SQL;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
+            $this->pdo->execute($sql, [
                 'userId' => $userId,
-                'hashedPassword' => $user->getHashedPassword()
+                'hashedPassword' => $hashedPassword
             ]);
-        } catch (PDOException $e) {
+        } catch (ByteBuddyDatabaseException $e) {
             throw new ByteBuddyDatabaseException('Failed to change password', 500, $e);
         }
     }
 
     /**
-     * @throws ByteBuddyValidationException
-     * @throws ByteBuddyUserNotFoundException
      * @throws ByteBuddyDatabaseException
      */
     public function deleteUser(int $userId): void
     {
-        $this->findUserById($userId);
-
         $sql = <<<SQL
             DELETE FROM 
                 users
@@ -144,11 +120,10 @@ class UserRepository
         SQL;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
+            $this->pdo->execute($sql, [
                 'userId' => $userId
             ]);
-        } catch (PDOException $e) {
+        } catch (ByteBuddyDatabaseException $e) {
             throw new ByteBuddyDatabaseException('Failed to delete user', 500, $e);
         }
     }
@@ -167,10 +142,8 @@ class UserRepository
         SQL;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            $userData = $stmt->fetchAll();
-        } catch (PDOException) {
+            $userData = $this->pdo->fetchAllQuery($sql);
+        } catch (ByteBuddyDatabaseException) {
             throw new ByteBuddyDatabaseException('Failed to get all users', 500);
         }
 
@@ -188,25 +161,70 @@ class UserRepository
      */
     public function userExists(string $email): bool
     {
+        return $this->recordExists('email', $email);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function userExistsById(int $userId): bool
+    {
+        return $this->recordExists('user_id', $userId);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getuserByUsername(string $username): array
+    {
+        return $this->getUserByField('username', $username);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getUserByEmail(string $email): array
+    {
+        return $this->getUserByField('email', $email);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getUserById(int $userId): array
+    {
+        return $this->getUserByField('user_id', $userId);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function userNameExists(string $username): bool
+    {
+        return $this->recordExists('username', $username);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    private function recordExists(string $field, mixed $value): bool
+    {
         $sql = <<<SQL
             SELECT 
                 COUNT(*)
             FROM 
                 users
             WHERE 
-                email = :email
+                $field = :value
         SQL;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'email' => $email
+            $count = $this->pdo->fetchColumn($sql, [
+                'value' => $value
             ]);
-
-            $count = $stmt->fetchColumn();
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException('Failed to check if user exists', 500, [
-                'email' => $email
+        } catch (ByteBuddyDatabaseException $e) {
+            throw new ByteBuddyDatabaseException("Failed to check if $field exists", 500, [
+                $field => $value
             ], $e);
         }
 
@@ -214,11 +232,9 @@ class UserRepository
     }
 
     /**
-     * @throws ByteBuddyValidationException
      * @throws ByteBuddyDatabaseException
-     * @throws ByteBuddyUserNotFoundException
      */
-    public function findUserByEmail(string $email): User
+    private function getUserByField(string $field, mixed $value): array
     {
         $sql = <<<SQL
             SELECT
@@ -226,65 +242,19 @@ class UserRepository
             FROM 
                 users
             WHERE 
-                email = :email
+                $field = :value
         SQL;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'email' => $email
+            $result = $this->pdo->fetchQuery($sql, [
+                'value' => $value
             ]);
 
-            $user = $stmt->fetch();
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException('Failed to find user by email', 500, [
-                'email' => $email
+            return $result ?: [];
+        } catch (ByteBuddyDatabaseException $e) {
+            throw new ByteBuddyDatabaseException("Failed to find user by $field", 500, [
+                $field => $value
             ], $e);
         }
-
-        if ($user === false) {
-            throw new ByteBuddyUserNotFoundException('User not found', 404, [
-                'email' => $email
-            ]);
-        }
-
-        return User::fromDatabase($user);
-    }
-
-    /**
-     * @throws ByteBuddyDatabaseException
-     * @throws ByteBuddyValidationException|ByteBuddyUserNotFoundException
-     */
-    public function findUserById(int $userId): ?User
-    {
-        $sql = <<<SQL
-            SELECT
-                *
-            FROM 
-                users
-            WHERE 
-                user_id = :userId
-        SQL;
-
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'userId' => $userId
-            ]);
-
-            $user = $stmt->fetch();
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException('Failed to find user by id', 500, [
-                'userId' => $userId
-            ], $e);
-        }
-
-        if ($user === false) {
-            throw new ByteBuddyUserNotFoundException('User not found', 404, [
-                'userId' => $userId
-            ]);
-        }
-
-        return User::fromDatabase($user);
     }
 }

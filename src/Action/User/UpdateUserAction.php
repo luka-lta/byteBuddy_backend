@@ -6,7 +6,7 @@ namespace ByteBuddyApi\Action\User;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
-use ByteBuddyApi\Service\Results\User\UserService;
+use ByteBuddyApi\Service\Results\User\UserActionService;
 use ByteBuddyApi\Service\ValidationService;
 use ByteBuddyApi\Value\Result;
 use ByteBuddyApi\Value\User\User;
@@ -18,11 +18,10 @@ use Throwable;
 class UpdateUserAction extends ByteBuddyAction
 {
     public function __construct(
-        private readonly UserService       $userService,
+        private readonly UserActionService $userService,
         private readonly ValidationService $validationService,
         private readonly Logger            $logger,
-    )
-    {
+    ) {
     }
 
     public function handleUpdateUserAction(
@@ -56,8 +55,7 @@ class UpdateUserAction extends ByteBuddyAction
         ServerRequestInterface $request,
         ResponseInterface      $response,
         string                 $userId
-    ): ResponseInterface
-    {
+    ): ResponseInterface {
         try {
             $this->validationService->checkForRequiredBodyParams([
                 'oldPassword',
@@ -74,7 +72,7 @@ class UpdateUserAction extends ByteBuddyAction
             );
         } catch (ByteBuddyValidationException $e) {
             $result = Result::from(false, $e->getMessage(), null, 400);
-        }  catch (Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
             $result = Result::from(false, 'Failed to change password', null, 500);
         }

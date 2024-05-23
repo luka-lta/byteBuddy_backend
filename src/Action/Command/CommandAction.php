@@ -38,17 +38,21 @@ class CommandAction extends ByteBuddyAction
             switch ($request->getQueryParams()['status']) {
                 case 'enabled':
                     $result = $this->commandStatusService->getAvailableCommands();
-                    return $this->buildResponse($response, $result);
+                    break;
                 case 'disabled':
                     $result = $this->commandStatusService->getDisabledCommand();
-                    return $this->buildResponse($response, $result);
+                    break;
+                case 'all':
+                    $result = $this->commandStatusService->getAllCommands();
+                    break;
                 default:
                     $result = Result::from(false, 'Invalid status', null, 400);
-                    return $this->buildResponse($response, $result);
+                    break;
             }
+            return $this->buildResponse($response, $result);
         }
 
-        $result = $this->commandStatusService->getAllCommands();
+        $result = Result::from(false, 'Status is required', null, 400);
         return $this->buildResponse($response, $result);
     }
 

@@ -28,7 +28,7 @@ class RoleRepository
      */
     public function getRoleFromUserId(int $userId): Role
     {
-        $this->userRepository->findUserById($userId);
+        $this->userRepository->getUserById($userId);
 
         $sql = <<<SQL
             SELECT role
@@ -55,7 +55,7 @@ class RoleRepository
      */
     public function updateRoleFromUser(int $userId, Role $role): void
     {
-        $this->userRepository->findUserById($userId);
+        $this->userRepository->getUserById($userId);
 
         $sql = <<<SQL
             UPDATE users

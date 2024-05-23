@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Action\User;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
-use ByteBuddyApi\Service\Results\User\UserService;
+use ByteBuddyApi\Service\Results\User\UserActionService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class DeleteUserAction extends ByteBuddyAction
 {
     public function __construct(
-        private readonly UserService $userService,
+        private readonly UserActionService $userService,
     ) {
     }
 

@@ -15,19 +15,20 @@ class User
      */
     private function __construct(
         private readonly ?int $userId,
-        private readonly string $username,
-        private readonly string $email,
+        private string $username,
+        private string $email,
         private ?string $hashedPassword,
-        private readonly string $role,
+        private string $role,
         private readonly ?DateTime $createdAt,
         private readonly ?DateTime $updatedAt,
+        private bool $disabled = false,
     ) {
         if ($this->username === '') {
-            throw new ByteBuddyValidationException('Username cannot be empty');
+            throw new ByteBuddyValidationException('Username cannot be empty', 400);
         }
 
         if ($this->email === '') {
-            throw new ByteBuddyValidationException('Email cannot be empty');
+            throw new ByteBuddyValidationException('Email cannot be empty', 400);
         }
     }
 
@@ -42,6 +43,7 @@ class User
         string $role,
         ?DateTime $createdAt = null,
         ?DateTime $updatedAt = null,
+        bool $disabled = false,
     ): self {
         return new self(
             $userId,
@@ -51,6 +53,7 @@ class User
             $role,
             $updatedAt,
             $createdAt,
+            $disabled,
         );
     }
 
@@ -63,7 +66,7 @@ class User
             $createdAt = $row['created_at'] ? new DateTime($row['created_at']) : null;
             $updatedAt = $row['updated_at'] ? new DateTime($row['updated_at']) : null;
         } catch (Exception $e) {
-            throw new ByteBuddyValidationException('Invalid date format');
+            throw new ByteBuddyValidationException('Invalid date format', 500, $row, $e);
         }
 
         return new self(
@@ -74,6 +77,7 @@ class User
             $row['role'],
             $createdAt,
             $updatedAt,
+            filter_var($row['disabled'], FILTER_VALIDATE_BOOL),
         );
     }
 
@@ -83,15 +87,15 @@ class User
     public function generatePasswordFromPlain(string $password): void
     {
         if ($password === '') {
-            throw new ByteBuddyValidationException('Password cannot be empty');
+            throw new ByteBuddyValidationException('Password cannot be empty', 400);
         }
 
         if (strlen($password) < 8) {
-            throw new ByteBuddyValidationException('Password must be at least 8 characters long');
+            throw new ByteBuddyValidationException('Password must be at least 8 characters long', 400);
         }
 
         if (!preg_match('/[A-Z]/', $password)) {
-            throw new ByteBuddyValidationException('Password must contain at least one uppercase letter');
+            throw new ByteBuddyValidationException('Password must contain at least one uppercase letter', 400);
         }
 
         $this->hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -109,6 +113,7 @@ class User
             'username' => $this->username,
             'email' => $this->email,
             'role' => $this->role,
+            'disabled' => $this->disabled,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
         ];
@@ -147,5 +152,35 @@ class User
     public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
+    }
+
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function setHashedPassword(?string $hashedPassword): void
+    {
+        $this->hashedPassword = $hashedPassword;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
+    }
+
+    public function setDisabled(bool $disabled): void
+    {
+        $this->disabled = $disabled;
     }
 }

@@ -18,7 +18,11 @@ class ExceptionService
     public function handleUserException(Exception $exception): void
     {
         if ($exception instanceof ByteBuddyDatabaseException) {
-            $this->logger->error($exception->getMessage(), $exception->getAdditionalData());
+            $this->logger->error($exception->getMessage(), [
+                'code' => $exception->getCode(),
+                'params' => $exception->getAdditionalData(),
+                'exception' => $exception->getPrevious(),
+            ]);
         }
     }
 }
