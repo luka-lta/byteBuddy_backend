@@ -56,7 +56,7 @@ class PdoUtil
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function fetchQuery(string $sql, array $params = []): array
+    public function fetchQuery(string $sql, array $params = []): ?array
     {
         try {
             $stmt = $this->pdo->prepare($sql);

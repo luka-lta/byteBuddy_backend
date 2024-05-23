@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Service\Results\User;
 
 use ByteBuddyApi\Exception\ByteBuddyException;
-use ByteBuddyApi\Exception\ByteBuddyValidationException;
-use ByteBuddyApi\Repository\UserRepository;
 use ByteBuddyApi\Service\AccessService;
 use ByteBuddyApi\Service\ExceptionService;
 use ByteBuddyApi\Service\UserService;
@@ -16,16 +14,12 @@ use ByteBuddyApi\Value\User\User;
 class UserActionService
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
         private readonly UserService $userService,
         private readonly AccessService $accessService,
         private readonly ExceptionService $exceptionService,
     ) {
     }
 
-    /**
-     * @throws ByteBuddyValidationException
-     */
     public function registerUser(string $username, string $email, string $password): Result
     {
         try {
@@ -120,7 +114,7 @@ class UserActionService
                 return Result::from(false, 'Forbidden', null, 403);
             }
 
-            $this->userRepository->deleteUser($userId);
+            $this->userService->deleteUser($userId);
         } catch (ByteBuddyException $e) {
             $this->exceptionService->handleUserException($e);
             return Result::from(false, $e->getMessage(), null, $e->getCode());

@@ -113,6 +113,7 @@ class User
             'username' => $this->username,
             'email' => $this->email,
             'role' => $this->role,
+            'disabled' => $this->disabled,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
         ];

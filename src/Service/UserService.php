@@ -11,7 +11,6 @@ use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Repository\UserRepository;
 use ByteBuddyApi\Value\User\User;
 
-// TODO: add validation
 class UserService
 {
     public function __construct(
@@ -20,7 +19,6 @@ class UserService
     ) {
     }
 
-    // TODO: Check if username exists
     /**
      * @throws ByteBuddyValidationException
      * @throws ByteBuddyDatabaseException
@@ -31,6 +29,13 @@ class UserService
         if ($this->userExists($email)) {
             throw new ByteBuddyUserAlreadyExistsException(
                 'User with email ' . $email . ' already exists',
+                400
+            );
+        }
+
+        if ($this->usernameExists($username)) {
+            throw new ByteBuddyUserAlreadyExistsException(
+                'User with username ' . $username . ' already exists',
                 400
             );
         }
@@ -54,6 +59,13 @@ class UserService
         if (!$user->verifyPassword($password)) {
             throw new ByteBuddyValidationException(
                 'Invalid password',
+                400
+            );
+        }
+
+        if ($user->isDisabled()) {
+            throw new ByteBuddyValidationException(
+                'User is disabled',
                 400
             );
         }
@@ -103,14 +115,18 @@ class UserService
     }
 
     /**
-     * @throws ByteBuddyValidationException
      * @throws ByteBuddyUserNotFoundException
      * @throws ByteBuddyDatabaseException
      */
     public function deleteUser(int $userId): void
     {
-        $this->getUserById($userId);
-        $this->deleteUser($userId);
+        if (!$this->userExists($userId)) {
+            throw new ByteBuddyUserNotFoundException(
+                'User with id ' . $userId . ' not found',
+                404
+            );
+        }
+        $this->userRepository->deleteUser($userId);
     }
 
     /**
@@ -158,6 +174,14 @@ class UserService
         }
 
         return $this->userRepository->userExists($identifier);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function usernameExists(string $username): bool
+    {
+        return $this->userRepository->userNameExists($username);
     }
 
     /**

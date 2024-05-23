@@ -161,26 +161,7 @@ class UserRepository
      */
     public function userExists(string $email): bool
     {
-        $sql = <<<SQL
-            SELECT 
-                COUNT(*)
-            FROM 
-                users
-            WHERE 
-                email = :email
-        SQL;
-
-        try {
-            $count = $this->pdo->fetchColumn($sql, [
-                'email' => $email
-            ]);
-        } catch (ByteBuddyDatabaseException $e) {
-            throw new ByteBuddyDatabaseException('Failed to check if user exists', 500, [
-                'email' => $email
-            ], $e);
-        }
-
-        return $count > 0;
+        return $this->recordExists('email', $email);
     }
 
     /**
@@ -188,28 +169,63 @@ class UserRepository
      */
     public function userExistsById(int $userId): bool
     {
+        return $this->recordExists('user_id', $userId);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getuserByUsername(string $username): array
+    {
+        return $this->getUserByField('username', $username);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getUserByEmail(string $email): array
+    {
+        return $this->getUserByField('email', $email);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getUserById(int $userId): array
+    {
+        return $this->getUserByField('user_id', $userId);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function userNameExists(string $username): bool
+    {
+        return $this->recordExists('username', $username);
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    private function recordExists(string $field, mixed $value): bool
+    {
         $sql = <<<SQL
             SELECT 
                 COUNT(*)
             FROM 
                 users
             WHERE 
-                user_id = :userId
+                $field = :value
         SQL;
 
         try {
             $count = $this->pdo->fetchColumn($sql, [
-                'userId' => $userId
+                'value' => $value
             ]);
         } catch (ByteBuddyDatabaseException $e) {
-            throw new ByteBuddyDatabaseException(
-                'Failed to check if user exists',
-                500,
-                [
-                    'email' => $userId
-                ],
-                $e
-            );
+            throw new ByteBuddyDatabaseException("Failed to check if $field exists", 500, [
+                $field => $value
+            ], $e);
         }
 
         return $count > 0;
@@ -218,7 +234,7 @@ class UserRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getUserByEmail(string $email): array
+    private function getUserByField(string $field, mixed $value): array
     {
         $sql = <<<SQL
             SELECT
@@ -226,51 +242,19 @@ class UserRepository
             FROM 
                 users
             WHERE 
-                email = :email
+                $field = :value
         SQL;
 
         try {
             $result = $this->pdo->fetchQuery($sql, [
-                'email' => $email
+                'value' => $value
             ]);
 
             return $result ?: [];
         } catch (ByteBuddyDatabaseException $e) {
-            throw new ByteBuddyDatabaseException('Failed to find user by email', 500, [
-                'email' => $email
+            throw new ByteBuddyDatabaseException("Failed to find user by $field", 500, [
+                $field => $value
             ], $e);
-        }
-    }
-
-    /**
-     * @throws ByteBuddyDatabaseException
-     */
-    public function getUserById(int $userId): array
-    {
-        $sql = <<<SQL
-            SELECT
-                *
-            FROM 
-                users
-            WHERE 
-                user_id = :userId
-        SQL;
-
-        try {
-            $result = $this->pdo->fetchQuery($sql, [
-                'userId' => $userId
-            ]);
-
-            return $result ?: [];
-        } catch (ByteBuddyDatabaseException $e) {
-            throw new ByteBuddyDatabaseException(
-                'Failed to find user by id',
-                500,
-                [
-                    'userId' => $userId
-                ],
-                $e
-            );
         }
     }
 }
