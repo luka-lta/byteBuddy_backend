@@ -6,7 +6,7 @@ namespace ByteBuddyApi\Action\Auth;
 
 use ByteBuddyApi\Action\ByteBuddyAction;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
-use ByteBuddyApi\Service\Results\User\UserService;
+use ByteBuddyApi\Service\Results\User\UserActionService;
 use ByteBuddyApi\Service\ValidationService;
 use ByteBuddyApi\Value\Result;
 use Monolog\Logger;
@@ -17,9 +17,9 @@ use Throwable;
 class RegisterAction extends ByteBuddyAction
 {
     public function __construct(
-        private readonly UserService $userService,
+        private readonly UserActionService $userService,
         private readonly ValidationService $validationService,
-        private readonly Logger $logger,
+        private readonly Logger            $logger,
     ) {
     }
 

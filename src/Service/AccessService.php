@@ -4,21 +4,33 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi\Service;
 
-use ByteBuddyApi\Repository\UserRepository;
+use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
+use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
+use ByteBuddyApi\Exception\ByteBuddyValidationException;
 
 class AccessService
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
+        private readonly UserService $userService,
     ) {
     }
 
+    /**
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyUserNotFoundException
+     * @throws ByteBuddyDatabaseException
+     */
     private function isAdministrator(int $accessUserId): bool
     {
-        $user = $this->userRepository->findUserById($accessUserId);
+        $user = $this->userService->getUserById($accessUserId);
         return $user->getRole() === 'ADMIN';
     }
 
+    /**
+     * @throws ByteBuddyValidationException
+     * @throws ByteBuddyUserNotFoundException
+     * @throws ByteBuddyDatabaseException
+     */
     public function hasAccess(int $ownerId, int $accessUserId): bool
     {
         if ($this->isAdministrator($accessUserId)) {
