@@ -15,6 +15,19 @@ class GuildService
     {
     }
 
+    public function getAllGuilds(): Result
+    {
+        try {
+            $guilds = $this->configRepository->getAllGuilds();
+        } catch (ByteBuddyException $e) {
+            return Result::from(false, $e->getMessage(), null, $e->getCode());
+        } catch (Exception) {
+            return Result::from(false, 'An error occurred', null, 500);
+        }
+
+        return Result::from(true, 'Guilds fetched successfully', $guilds, 200);
+    }
+
     public function registerGuild(string $guildId, string $serverName): Result
     {
         try {

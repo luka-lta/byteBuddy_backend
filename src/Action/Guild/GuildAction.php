@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ByteBuddyApi\Action\Guild;
@@ -13,8 +14,13 @@ class GuildAction extends ByteBuddyAction
 {
     public function __construct(
         private readonly GuildService $configService
-    )
+    ) {
+    }
+
+    public function handleGetAllGuilds(ResponseInterface $response): ResponseInterface
     {
+        $result = $this->configService->getAllGuilds();
+        return $this->buildResponse($response, $result);
     }
 
     public function handleRegisterGuild(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -31,8 +37,10 @@ class GuildAction extends ByteBuddyAction
         return $this->buildResponse($response, $result);
     }
 
-    public function handleGetConfigAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
+    public function handleGetConfigAction(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ): ResponseInterface {
         $guildId = $request->getQueryParams()['guildId'] ?? null;
 
         if (!$guildId) {

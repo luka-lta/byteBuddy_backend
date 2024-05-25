@@ -5,20 +5,43 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
+use ByteBuddyApi\Utils\PdoUtil;
 use ByteBuddyApi\Value\Guild\GuildObject;
-use PDO;
 use PDOException;
 
 class GuildRepository
 {
-    public function __construct(private readonly PDO $pdo)
+    public function __construct(private readonly PdoUtil $pdo)
     {
     }
 
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function registerNewGuild(string $guildId, string $serverName): bool
+    public function getAllGuilds(): array
+    {
+        $sql = <<<SQL
+            SELECT * FROM guild_data
+        SQL;
+
+        try {
+            $result = $this->pdo->fetchAllQuery($sql);
+        } catch (ByteBuddyDatabaseException $e) {
+            throw new ByteBuddyDatabaseException(
+                'Failed to fetch all guilds',
+                500,
+                [],
+                $e
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function registerNewGuild(string $guildId, string $serverName): void
     {
         $sql = <<<SQL
             INSERT INTO guild_data (guild_id, server_name) VALUES (:guildId, :serverId)
@@ -28,8 +51,7 @@ class GuildRepository
         }
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute([
+            $this->pdo->execute($sql, [
                 'guildId' => $guildId,
                 'serverId' => $serverName
             ]);
@@ -51,9 +73,7 @@ class GuildRepository
         }
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            $result = $stmt->fetch();
+            $result = $this->pdo->fetchQuery($sql);
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to fetch config data', 500);
         }
@@ -75,8 +95,7 @@ class GuildRepository
         }
 
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
+            $this->pdo->execute($sql, [
                 'value' => $value,
                 'guildId' => $guildId
             ]);
@@ -94,9 +113,8 @@ class GuildRepository
             SELECT guild_id FROM guild_data WHERE guild_id = :guildId
         SQL;
         try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['guildId' => $guildId]);
-            return $stmt->fetch() !== false;
+            $result = $this->pdo->fetchQuery($sql, ['guildId' => $guildId]);
+            return $result !== false;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if guild exists', 500);
         }

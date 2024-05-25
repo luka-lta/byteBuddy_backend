@@ -10,26 +10,16 @@ use Exception;
 
 class User
 {
-    /**
-     * @throws ByteBuddyValidationException
-     */
     private function __construct(
         private readonly ?int $userId,
-        private string $username,
-        private string $email,
-        private ?string $hashedPassword,
-        private string $role,
+        private Username $username,
+        private Email $email,
+        private ?Password $hashedPassword,
+        private Role $role,
         private readonly ?DateTime $createdAt,
         private readonly ?DateTime $updatedAt,
         private bool $disabled = false,
     ) {
-        if ($this->username === '') {
-            throw new ByteBuddyValidationException('Username cannot be empty', 400);
-        }
-
-        if ($this->email === '') {
-            throw new ByteBuddyValidationException('Email cannot be empty', 400);
-        }
     }
 
     /**
@@ -47,10 +37,10 @@ class User
     ): self {
         return new self(
             $userId,
-            $username,
-            $email,
-            $hashedPassword,
-            $role,
+            Username::from($username),
+            Email::from($email),
+            Password::fromHash($hashedPassword),
+            Role::from($role),
             $updatedAt,
             $createdAt,
             $disabled,
@@ -71,48 +61,23 @@ class User
 
         return new self(
             $row['user_id'],
-            $row['username'],
-            $row['email'],
-            $row['hashed_password'],
-            $row['role'],
+            Username::from($row['username']),
+            Email::from($row['email']),
+            Password::fromHash($row['hashed_password']),
+            Role::from($row['role']),
             $createdAt,
             $updatedAt,
             filter_var($row['disabled'], FILTER_VALIDATE_BOOL),
         );
     }
 
-    /**
-     * @throws ByteBuddyValidationException
-     */
-    public function generatePasswordFromPlain(string $password): void
-    {
-        if ($password === '') {
-            throw new ByteBuddyValidationException('Password cannot be empty', 400);
-        }
-
-        if (strlen($password) < 8) {
-            throw new ByteBuddyValidationException('Password must be at least 8 characters long', 400);
-        }
-
-        if (!preg_match('/[A-Z]/', $password)) {
-            throw new ByteBuddyValidationException('Password must contain at least one uppercase letter', 400);
-        }
-
-        $this->hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    }
-
-    public function verifyPassword(string $password): bool
-    {
-        return password_verify($password, $this->hashedPassword);
-    }
-
     public function toArray(): array
     {
         return [
             'userId' => $this->userId,
-            'username' => $this->username,
-            'email' => $this->email,
-            'role' => $this->role,
+            'username' => $this->username->getValue(),
+            'email' => $this->email->getValue(),
+            'role' => $this->role->getValue(),
             'disabled' => $this->disabled,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
@@ -124,22 +89,22 @@ class User
         return $this->userId;
     }
 
-    public function getUsername(): string
+    public function getUsername(): Username
     {
         return $this->username;
     }
 
-    public function getEmail(): string
+    public function getEmail(): Email
     {
         return $this->email;
     }
 
-    public function getHashedPassword(): string
+    public function getPassword(): Password
     {
         return $this->hashedPassword;
     }
 
-    public function getRole(): string
+    public function getRole(): Role
     {
         return $this->role;
     }
@@ -159,12 +124,12 @@ class User
         return $this->disabled;
     }
 
-    public function setUsername(string $username): void
+    public function setUsername(Username $username): void
     {
         $this->username = $username;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(Email $email): void
     {
         $this->email = $email;
     }
@@ -174,7 +139,7 @@ class User
         $this->hashedPassword = $hashedPassword;
     }
 
-    public function setRole(string $role): void
+    public function setRole(Role $role): void
     {
         $this->role = $role;
     }
