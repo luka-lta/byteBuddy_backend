@@ -82,8 +82,6 @@ class UserService
      */
     public function updateUser(User $user): void
     {
-        var_dump($this->userExists($user->getUserId()));
-
         if (!$this->userExists($user->getUserId())) {
             throw new ByteBuddyUserNotFoundException(
                 'User with id ' . $user->getUserId() . ' not found',

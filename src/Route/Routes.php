@@ -11,6 +11,7 @@ use ByteBuddyApi\Action\Channel\ChannelConfigAction;
 use ByteBuddyApi\Action\Command\CommandAction;
 use ByteBuddyApi\Action\Guild\GuildAction;
 use ByteBuddyApi\Action\Health\HealthAction;
+use ByteBuddyApi\Action\History\CommandHistoryAction;
 use ByteBuddyApi\Action\User\DeleteUserAction;
 use ByteBuddyApi\Action\User\GetUserAction;
 use ByteBuddyApi\Action\User\RoleAction;
@@ -39,6 +40,12 @@ class Routes
                 $commands->get('', [CommandAction::class, 'handleGetCommandsAction']);
                 $commands->post('/toggle', [CommandAction::class, 'handleToggleCommand']);
                 $commands->post('/register', [CommandAction::class, 'handleRegisterCommandAction']);
+            });
+
+
+            // TODO: Auth for bot
+            $group->group('/history', function (RouteCollectorProxy $history) {
+                $history->post('/command', [CommandHistoryAction::class, 'handleCreateCommandHistory']);
             });
 
             $group->group('/user', function (RouteCollectorProxy $user) {
