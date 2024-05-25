@@ -24,7 +24,6 @@ class PdoUtil
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
         } catch (PDOException $e) {
-            var_dump($e->getMessage());
             throw new ByteBuddyDatabaseException(
                 'Failed to execute query',
                 500,
