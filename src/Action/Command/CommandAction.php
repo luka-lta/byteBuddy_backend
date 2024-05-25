@@ -43,7 +43,7 @@ class CommandAction extends ByteBuddyAction
                     $result = $this->commandStatusService->getDisabledCommand();
                     break;
                 case 'all':
-                    $result = $this->commandStatusService->getAllCommands();
+                    $result = $this->commandStatusService->getAllCommands((int)$request->getQueryParams()['page'] ?? 1);
                     break;
                 default:
                     $result = Result::from(false, 'Invalid status', null, 400);

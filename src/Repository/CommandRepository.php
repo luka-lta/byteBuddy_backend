@@ -6,14 +6,17 @@ namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyCommandNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
+use ByteBuddyApi\Service\PaginationService;
 use ByteBuddyApi\Value\Command;
 use PDO;
 use PDOException;
 
 class CommandRepository
 {
-    public function __construct(private readonly PDO $pdo)
-    {
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly PaginationService $paginationService
+    ) {
     }
 
     /**
@@ -102,14 +105,30 @@ class CommandRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getAllCommands(): array|null
+    public function getAllCommands(int $page = 1, int $itemsPerPage = 10): array|null
     {
+        $offset = ($page - 1) * $itemsPerPage;
+
         $sql = <<<SQL
-            SELECT * FROM command_data
+            SELECT * FROM command_data LIMIT :limit OFFSET :offset
         SQL;
+
+        $countSql = <<<SQL
+            SELECT COUNT(*) as count FROM command_data
+        SQL;
+
         try {
+            $countStmt = $this->pdo->prepare($countSql);
+            $countStmt->execute();
+            $totalItems = $countStmt->fetch()['count'];
+
+
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
+            $stmt->execute([
+                'limit' => $itemsPerPage,
+                'offset' => $offset
+            ]);
+
             if ($stmt->rowCount() === 0) {
                 return null;
             }
@@ -125,7 +144,12 @@ class CommandRepository
             $commands[] = $userObject->toArray();
         }
 
-        return $commands;
+        $pagination = $this->paginationService->paginate($totalItems, $page, $itemsPerPage);
+
+        return [
+            'pagination' => $pagination,
+            'commands' => $commands,
+        ];
     }
 
     /**
@@ -153,9 +177,9 @@ class CommandRepository
      * @throws ByteBuddyDatabaseException
      * @throws ByteBuddyCommandNotFoundException
      */
-    public function toggleCommandById(int $id): bool
+    public function toggleCommandById(int $commandId): bool
     {
-        if (!$this->commandExistsById($id)) {
+        if (!$this->commandExistsById($commandId)) {
             throw new ByteBuddyCommandNotFoundException('Command not found', 404);
         }
 
@@ -164,12 +188,12 @@ class CommandRepository
         SQL;
         try {
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['id' => $id]);
+            $stmt->execute(['id' => $commandId]);
             $statusSql = <<<SQL
             SELECT disabled FROM command_data WHERE id = :id
         SQL;
             $statusStmt = $this->pdo->prepare($statusSql);
-            $statusStmt->execute(['id' => $id]);
+            $statusStmt->execute(['id' => $commandId]);
             $status = $statusStmt->fetchColumn();
             return (bool) $status;
         } catch (PDOException) {

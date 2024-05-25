@@ -57,10 +57,10 @@ class CommandService
         }
     }
 
-    public function getAllCommands(): Result
+    public function getAllCommands(int $page): Result
     {
         try {
-            $result = $this->commandRepository->getAllCommands();
+            $result = $this->commandRepository->getAllCommands($page);
             if (!$result) {
                 return Result::from(true, 'No commands found', null, 404);
             }
