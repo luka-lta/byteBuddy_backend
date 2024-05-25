@@ -29,6 +29,7 @@ class Routes
             $group->post('/register', [GuildAction::class, 'handleRegisterGuild']);
             $group->get('/guild', [GuildAction::class, 'handleGetConfigAction']);
             $group->post('/guild', [GuildAction::class, 'handleSetConfigData']);
+            $group->get('/guilds', [GuildAction::class, 'handleGetAllGuilds']);
             $group->post('/channels', [ChannelConfigAction::class, 'handleSetChannels']);
             $group->get('/channels', [ChannelConfigAction::class, 'handleGetChannels']);
             $group->get('/birthdays', [BirthdayAction::class, 'handleGetBirthdaysFromGuildAction']);
