@@ -49,13 +49,6 @@ jobs:
       - name: Set up Docker Compose
         run: docker-compose up -d
 
-      - name: Wait for MySQL to be ready
-        run: |
-          while ! docker-compose exec mysql mysqladmin --user=root --password=1234 ping --silent &> /dev/null ; do
-            echo "Waiting for database connection..."
-            sleep 5
-          done
-
       - name: Run PHPCS
         run: docker-compose exec php-fpm vendor/bin/phpcs --standard=PSR12 /app/src
 
