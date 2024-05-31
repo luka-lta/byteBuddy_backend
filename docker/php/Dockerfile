@@ -10,7 +10,7 @@ RUN chown -R www-data:www-data /app/
 
 RUN docker-php-ext-install pdo pdo_mysql
 
-RUN apt-get update && apt-get install -y \
+RUN apk update && apk add --no-cache \
     git \
     unzip
 
