@@ -55,7 +55,7 @@ jobs:
       - name: Download Docker image
         uses: actions/download-artifact@v2
         with:
-          name: my-app-image
+          name: bytebuddy-image
           path: /tmp/.buildx-cache
 
       - name: Load Docker image
