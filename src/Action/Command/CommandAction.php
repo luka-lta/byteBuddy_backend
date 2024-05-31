@@ -35,15 +35,17 @@ class CommandAction extends ByteBuddyAction
         ResponseInterface $response
     ): ResponseInterface {
         if (isset($request->getQueryParams()['status'])) {
+            $page = (int)$request->getQueryParams()['page'] ?? 1;
+            $limit = (int)$request->getQueryParams()['limit'] ?? 10;
             switch ($request->getQueryParams()['status']) {
                 case 'enabled':
-                    $result = $this->commandStatusService->getAvailableCommands();
+                    $result = $this->commandStatusService->getAvailableCommands($page, $limit);
                     break;
                 case 'disabled':
-                    $result = $this->commandStatusService->getDisabledCommand();
+                    $result = $this->commandStatusService->getDisabledCommand($page, $limit);
                     break;
                 case 'all':
-                    $result = $this->commandStatusService->getAllCommands((int)$request->getQueryParams()['page'] ?? 1);
+                    $result = $this->commandStatusService->getAllCommands($page, $limit);
                     break;
                 default:
                     $result = Result::from(false, 'Invalid status', null, 400);

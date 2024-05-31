@@ -14,7 +14,7 @@ use PDOException;
 class CommandRepository
 {
     public function __construct(
-        private readonly PDO $pdo,
+        private readonly PDO               $pdo,
         private readonly PaginationService $paginationService
     ) {
     }
@@ -33,7 +33,7 @@ class CommandRepository
         $insertStmt = $this->pdo->prepare($insertSql);
         $updateStmt = $this->pdo->prepare($updateSql);
         $existingCommands = [];
-/** @var Command $command */
+        /** @var Command $command */
         foreach ($commands as $command) {
             $existingCommands[] = $command->getName();
             if ($this->commandExists($command->getName())) {
@@ -84,22 +84,13 @@ class CommandRepository
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getAvailableCommands(): array|null
+    public function getAvailableCommands(int $page = 1, int $itemsPerPage = 10): array|null
     {
         $sql = <<<SQL
-            SELECT * FROM command_data WHERE disabled = 0
+             SELECT * FROM command_data WHERE disabled = 0 LIMIT :limit OFFSET :offset
         SQL;
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            if ($stmt->rowCount() === 0) {
-                return null;
-            }
-
-            return $stmt->fetchAll();
-        } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to get available commands', 500);
-        }
+        $countSql = "SELECT COUNT(*) as count FROM command_data WHERE disabled = 0";
+        return $this->fetchCommands($sql, $countSql, $page, $itemsPerPage);
     }
 
     /**
@@ -107,70 +98,19 @@ class CommandRepository
      */
     public function getAllCommands(int $page = 1, int $itemsPerPage = 10): array|null
     {
-        $offset = ($page - 1) * $itemsPerPage;
-
-        $sql = <<<SQL
-            SELECT * FROM command_data LIMIT :limit OFFSET :offset
-        SQL;
-
-        $countSql = <<<SQL
-            SELECT COUNT(*) as count FROM command_data
-        SQL;
-
-        try {
-            $countStmt = $this->pdo->prepare($countSql);
-            $countStmt->execute();
-            $totalItems = $countStmt->fetch()['count'];
-
-
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'limit' => $itemsPerPage,
-                'offset' => $offset
-            ]);
-
-            if ($stmt->rowCount() === 0) {
-                return null;
-            }
-
-            $commandsData = $stmt->fetchAll();
-        } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to get all commands', 500);
-        }
-
-        $commands = [];
-        foreach ($commandsData as $command) {
-            $userObject = Command::fromDatabase($command);
-            $commands[] = $userObject->toArray();
-        }
-
-        $pagination = $this->paginationService->paginate($totalItems, $page, $itemsPerPage);
-
-        return [
-            'pagination' => $pagination,
-            'commands' => $commands,
-        ];
+        $sql = "SELECT * FROM command_data LIMIT :limit OFFSET :offset";
+        $countSql = "SELECT COUNT(*) as count FROM command_data";
+        return $this->fetchCommands($sql, $countSql, $page, $itemsPerPage);
     }
 
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function getDisabledCommands(): array|null
+    public function getDisabledCommands(int $page = 1, int $itemsPerPage = 10): array|null
     {
-        $sql = <<<SQL
-            SELECT * FROM command_data WHERE disabled = 1
-        SQL;
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
-            if ($stmt->rowCount() === 0) {
-                return null;
-            }
-
-            return $stmt->fetchAll();
-        } catch (PDOException) {
-            throw new ByteBuddyDatabaseException('Failed to get disabled commands', 500);
-        }
+        $sql = "SELECT * FROM command_data WHERE disabled = 1 LIMIT :limit OFFSET :offset";
+        $countSql = "SELECT COUNT(*) as count FROM command_data WHERE disabled = 1";
+        return $this->fetchCommands($sql, $countSql, $page, $itemsPerPage);
     }
 
     /**
@@ -195,7 +135,7 @@ class CommandRepository
             $statusStmt = $this->pdo->prepare($statusSql);
             $statusStmt->execute(['id' => $commandId]);
             $status = $statusStmt->fetchColumn();
-            return (bool) $status;
+            return (bool)$status;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
         }
@@ -222,7 +162,7 @@ class CommandRepository
             $statusStmt = $this->pdo->prepare($statusSql);
             $statusStmt->execute(['name' => $name]);
             $status = $statusStmt->fetchColumn();
-            return (bool) $status;
+            return (bool)$status;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
         }
@@ -260,6 +200,47 @@ class CommandRepository
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if command exists', 500);
         }
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    private function fetchCommands(string $sql, string $countSql, int $page, int $itemsPerPage): array|null
+    {
+        $offset = ($page - 1) * $itemsPerPage;
+
+        try {
+            $countStmt = $this->pdo->prepare($countSql);
+            $countStmt->execute();
+            $totalItems = $countStmt->fetch()['count'];
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'limit' => $itemsPerPage,
+                'offset' => $offset
+            ]);
+
+            if ($stmt->rowCount() === 0) {
+                return null;
+            }
+
+            $commandsData = $stmt->fetchAll();
+        } catch (PDOException $exception) {
+            throw new ByteBuddyDatabaseException('Failed to get commands', 500, previousException: $exception);
+        }
+
+        $commands = [];
+        foreach ($commandsData as $command) {
+            $userObject = Command::fromDatabase($command);
+            $commands[] = $userObject->toArray();
+        }
+
+        $pagination = $this->paginationService->paginate($totalItems, $page, $itemsPerPage);
+
+        return [
+            'pagination' => $pagination,
+            'commands' => $commands,
+        ];
     }
 
     private function deleteObsoleteCommands(array $existingCommands): void

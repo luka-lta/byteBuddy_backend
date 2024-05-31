@@ -43,10 +43,10 @@ class CommandService
         }
     }
 
-    public function getAvailableCommands(): Result
+    public function getAvailableCommands(int $page, int $limit): Result
     {
         try {
-            $result = $this->commandRepository->getAvailableCommands();
+            $result = $this->commandRepository->getAvailableCommands($page, $limit);
             if (!$result) {
                 return Result::from(true, 'No available commands', null, 404);
             }
@@ -57,10 +57,10 @@ class CommandService
         }
     }
 
-    public function getAllCommands(int $page): Result
+    public function getAllCommands(int $page, int $limit): Result
     {
         try {
-            $result = $this->commandRepository->getAllCommands($page);
+            $result = $this->commandRepository->getAllCommands($page, $limit);
             if (!$result) {
                 return Result::from(true, 'No commands found', null, 404);
             }
@@ -71,10 +71,10 @@ class CommandService
         }
     }
 
-    public function getDisabledCommand(): Result
+    public function getDisabledCommand(int $page, int $limit): Result
     {
         try {
-            $result = $this->commandRepository->getDisabledCommands();
+            $result = $this->commandRepository->getDisabledCommands($page, $limit);
             if (!$result) {
                 return Result::from(true, 'No disabled commands found', null, 404);
             }
@@ -85,10 +85,10 @@ class CommandService
         }
     }
 
-    public function toggleCommandById(int $id): Result
+    public function toggleCommandById(int $commandId): Result
     {
         try {
-            $state = $this->commandRepository->toggleCommandById($id);
+            $state = $this->commandRepository->toggleCommandById($commandId);
             $message = $state ? 'Command enabled' : 'Command disabled';
             return Result::from(true, $message, null, 200);
         } catch (ByteBuddyException $exception) {
