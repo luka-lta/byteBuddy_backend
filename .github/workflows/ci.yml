@@ -50,10 +50,10 @@ jobs:
         run: docker-compose up -d
 
       - name: Run PHPCS
-        run: docker-compose exec php-fpm vendor/bin/phpcs --standard=PSR12 /app/src
+        run: docker-compose exec -T php-fpm vendor/bin/phpcs --standard=PSR12 /app/src
 
       - name: Run PHPMD
-        run: docker-compose exec php-fpm vendor/bin/phpmd /app/src text cleancode,codesize,controversial,design,naming,unusedcode
+        run: docker-compose exec -T php-fpm vendor/bin/phpmd /app/src text cleancode,codesize,controversial,design,naming,unusedcode
 
       - name: Tear down Docker Compose
         if: always()
