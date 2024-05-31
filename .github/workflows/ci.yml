@@ -29,12 +29,6 @@ jobs:
       - name: Build Docker image
         run: docker compose build
 
-      - name: Save Docker image
-        uses: actions/upload-artifact@v2
-        with:
-          name: bytebuddy-image
-          path: /tmp/.buildx-cache
-
   code_style:
     runs-on: ubuntu-latest
     needs: build
@@ -51,15 +45,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Download Docker image
-        uses: actions/download-artifact@v2
-        with:
-          name: bytebuddy-image
-          path: /tmp/.buildx-cache
-
-      - name: Load Docker image
-        run: docker load -i /tmp/.buildx-cache
 
       - name: Set up Docker Compose
         run: docker-compose up -d
