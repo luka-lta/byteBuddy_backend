@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
-use ByteBuddyApi\Exception\ByteBuddyInvalidRoleException;
 use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
 use ByteBuddyApi\Value\User\Role;
@@ -21,10 +20,8 @@ class RoleRepository
     }
 
     /**
-     * @throws ByteBuddyInvalidRoleException
      * @throws ByteBuddyValidationException
      * @throws ByteBuddyDatabaseException
-     * @throws ByteBuddyUserNotFoundException
      */
     public function getRoleFromUserId(int $userId): Role
     {
