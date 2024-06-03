@@ -7,6 +7,7 @@ namespace ByteBuddyApi\Repository;
 use ByteBuddyApi\Exception\ByteBuddyCommandNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Service\PaginationService;
+use ByteBuddyApi\Utils\PdoUtil;
 use ByteBuddyApi\Value\Command;
 use PDO;
 use PDOException;
@@ -14,7 +15,7 @@ use PDOException;
 class CommandRepository
 {
     public function __construct(
-        private readonly PDO               $pdo,
+        private readonly PdoUtil           $pdo,
         private readonly PaginationService $paginationService
     ) {
     }
@@ -30,14 +31,14 @@ class CommandRepository
         $updateSql = <<<SQL
         UPDATE command_data SET description = :description, disabled = :disabled WHERE name = :name
         SQL;
-        $insertStmt = $this->pdo->prepare($insertSql);
-        $updateStmt = $this->pdo->prepare($updateSql);
         $existingCommands = [];
+
         /** @var Command $command */
         foreach ($commands as $command) {
             $existingCommands[] = $command->getName();
             if ($this->commandExists($command->getName())) {
-                $updateStmt->execute([
+                $stmt = $this->pdo->query($updateSql);
+                $stmt->execute([
                     'name' => $command->getName(),
                     'description' => $command->getDescription(),
                     'disabled' => $command->isDisabled() ? 1 : 0
@@ -46,7 +47,8 @@ class CommandRepository
             }
 
             try {
-                $insertStmt->execute([
+                $stmt = $this->pdo->query($insertSql);
+                $stmt->execute([
                     'name' => $command->getName(),
                     'description' => $command->getDescription(),
                     'disabled' => $command->isDisabled() ? 1 : 0
@@ -129,13 +131,14 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['id' => $commandId]);
+
             $statusSql = <<<SQL
-            SELECT disabled FROM command_data WHERE id = :id
-        SQL;
-            $statusStmt = $this->pdo->prepare($statusSql);
-            $statusStmt->execute(['id' => $commandId]);
-            $status = $statusStmt->fetchColumn();
-            return (bool)$status;
+                SELECT disabled FROM command_data WHERE id = :id
+            SQL;
+
+            $stmt = $this->pdo->prepare($statusSql);
+            $stmt->execute(['id' => $commandId]);
+            return (bool)$stmt->fetchColumn();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
         }
@@ -156,13 +159,14 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['name' => $name]);
+
             $statusSql = <<<SQL
-            SELECT disabled FROM command_data WHERE name = :name
-        SQL;
-            $statusStmt = $this->pdo->prepare($statusSql);
-            $statusStmt->execute(['name' => $name]);
-            $status = $statusStmt->fetchColumn();
-            return (bool)$status;
+                SELECT disabled FROM command_data WHERE name = :name
+            SQL;
+
+            $stmt = $this->pdo->prepare($statusSql);
+            $stmt->execute(['name' => $name]);
+            return (bool)$stmt->fetchColumn();
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to toggle command', 500);
         }
@@ -179,6 +183,7 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['name' => $name]);
+
             return $stmt->rowCount() > 0;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if command exists', 500);
@@ -196,6 +201,7 @@ class CommandRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['id' => $commmandId]);
+
             return $stmt->rowCount() > 0;
         } catch (PDOException) {
             throw new ByteBuddyDatabaseException('Failed to check if command exists', 500);
@@ -210,9 +216,9 @@ class CommandRepository
         $offset = ($page - 1) * $itemsPerPage;
 
         try {
-            $countStmt = $this->pdo->prepare($countSql);
-            $countStmt->execute();
-            $totalItems = $countStmt->fetch()['count'];
+            $rowStmt = $this->pdo->prepare($sql);
+            $rowStmt->execute();
+            $totalItems = $rowStmt->fetch()['count'];
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
@@ -243,11 +249,13 @@ class CommandRepository
         ];
     }
 
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
     private function deleteObsoleteCommands(array $existingCommands): void
     {
         $placeholders = implode(', ', array_fill(0, count($existingCommands), '?'));
         $sql = "DELETE FROM command_data WHERE name NOT IN ($placeholders)";
-        $deleteStmt = $this->pdo->prepare($sql);
-        $deleteStmt->execute($existingCommands);
+        $this->pdo->prepare($sql)->execute($existingCommands);
     }
 }

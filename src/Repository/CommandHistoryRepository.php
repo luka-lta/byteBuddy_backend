@@ -6,6 +6,7 @@ namespace ByteBuddyApi\Repository;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Utils\PdoUtil;
+use DateTime;
 
 class CommandHistoryRepository
 {
@@ -36,5 +37,30 @@ class CommandHistoryRepository
                 previousException: $e
             );
         }
+    }
+
+    /**
+     * @throws ByteBuddyDatabaseException
+     */
+    public function getHistoryByDateRange(DateTime $startDate, DateTime $endDate): array
+    {
+        $sql = <<<SQL
+            SELECT * FROM command_history WHERE executed_at BETWEEN :startDate AND :endDate
+        SQL;
+
+        try {
+            $data = $this->pdo->fetchAllQuery($sql, [
+                'startDate' => $startDate->format('Y-m-d H:i:s'),
+                'endDate' => $endDate->format('Y-m-d H:i:s'),
+            ]);
+        } catch (ByteBuddyDatabaseException $e) {
+            throw new ByteBuddyDatabaseException(
+                'Failed to get command history',
+                $e->getCode(),
+                previousException: $e
+            );
+        }
+
+        return $data;
     }
 }

@@ -8,7 +8,7 @@ use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Exception\ByteBuddyUserAlreadyExistsException;
 use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
-use ByteBuddyApi\Repository\UserRepository;
+use ByteBuddyApi\Repository\User\UserRepository;
 use ByteBuddyApi\Value\User\User;
 
 class UserService
@@ -43,7 +43,7 @@ class UserService
         $user = User::from(null, $username, $email, $password, 'USER');
         $user->getPassword()->generatePasswordFromPlain($password);
 
-        return $this->userRepository->createUser($user);
+        return $this->userRepository->create($user);
     }
 
     /**
@@ -89,7 +89,7 @@ class UserService
             );
         }
 
-        $this->userRepository->updateUser($user);
+        $this->userRepository->update($user);
     }
 
     /**
@@ -124,7 +124,7 @@ class UserService
                 404
             );
         }
-        $this->userRepository->deleteUser($userId);
+        $this->userRepository->delete($userId);
     }
 
     /**
@@ -143,7 +143,7 @@ class UserService
      */
     public function getUserById(int $userId): User
     {
-        $userData = $this->userRepository->getUserById($userId);
+        $userData = $this->userRepository->find($userId);
         $this->ensureUserExists($userData, $userId);
 
         return $this->createUserFromDatabaseData($userData);
@@ -185,9 +185,9 @@ class UserService
     /**
      * @throws ByteBuddyUserNotFoundException
      */
-    private function ensureUserExists(array $userData, int|string $identifier): void
+    private function ensureUserExists(?array $userData, int|string $identifier): void
     {
-        if (empty($userData)) {
+        if ($userData === null) {
             throw new ByteBuddyUserNotFoundException(
                 'User with identifier ' . $identifier . ' not found',
                 404

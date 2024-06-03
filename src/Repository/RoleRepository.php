@@ -7,6 +7,7 @@ namespace ByteBuddyApi\Repository;
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
 use ByteBuddyApi\Exception\ByteBuddyUserNotFoundException;
 use ByteBuddyApi\Exception\ByteBuddyValidationException;
+use ByteBuddyApi\Repository\User\UserRepository;
 use ByteBuddyApi\Value\User\Role;
 use PDO;
 use PDOException;

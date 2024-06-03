@@ -5,112 +5,83 @@ declare(strict_types=1);
 namespace ByteBuddyApi\Utils;
 
 use ByteBuddyApi\Exception\ByteBuddyDatabaseException;
+use DI\DependencyException;
+use JetBrains\PhpStorm\Language;
 use PDO;
 use PDOException;
+use PDOStatement;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class PdoUtil
 {
-    public function __construct(
-        private readonly PDO $pdo
-    ) {
+    private ?PDO $pdo = null;
+
+    private const HASH_ALGO = 'fnv164';
+    private array $statementCache = [];
+
+    public function __construct(private readonly ContainerInterface $container)
+    {
     }
 
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function execute(string $sql, array $params = []): void
+    public function exec(string $statement): bool
     {
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException(
-                'Failed to execute query',
-                500,
-                $params,
-                $e
-            );
-        }
+        $this->checkIfPdoInitialize();
+        return $this->pdo->exec($statement);
     }
 
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function executeUpdate(string $sql, array $params = []): int
+    public function query(#[Language('SQL')] string $statement): bool|PDOStatement
     {
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException(
-                'Failed to execute update query',
-                500,
-                $params,
-                $e
-            );
-        }
+        $this->checkIfPdoInitialize();
+        return $this->pdo->query($statement);
     }
 
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function fetchQuery(string $sql, array $params = []): ?array
+    public function prepare(#[Language('SQL')] string $query, array $options = []): PDOStatement
     {
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetch();
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException(
-                'Failed to fetch query',
-                500,
-                $params,
-                $e
-            );
+        $cacheKey = hash(self::HASH_ALGO, $query);
+
+        if (!isset($this->statementCache[$cacheKey])) {
+            $this->checkIfPdoInitialize();
+            $this->statementCache[$cacheKey] = $this->pdo->prepare($query, $options);
         }
+
+        return $this->statementCache[$cacheKey];
     }
 
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function fetchAllQuery(string $sql, array $params = []): array
+    public function lastInsertId(string $name = null): string|false
     {
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException(
-                'Failed to fetch all query',
-                500,
-                $params,
-                $e
-            );
-        }
+        $this->checkIfPdoInitialize();
+        return $this->pdo->lastInsertId($name);
     }
 
     /**
      * @throws ByteBuddyDatabaseException
      */
-    public function fetchColumn(string $sql, array $params = []): int
+    public function checkIfPdoInitialize(): void
     {
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetchColumn();
-        } catch (PDOException $e) {
-            throw new ByteBuddyDatabaseException(
-                'Failed to fetch column query',
-                500,
-                $params,
-                $e
-            );
+        if ($this->pdo === null) {
+            try {
+                $this->pdo = $this->container->get(PDO::class);
+            } catch (DependencyException | ContainerExceptionInterface | NotFoundExceptionInterface $e) {
+                throw new ByteBuddyDatabaseException(
+                    'Failed to initialize PDO',
+                    500,
+                    previousException: $e
+                );
+            }
         }
-    }
-
-    public function getLastInsertedId(): int
-    {
-        return (int)$this->pdo->lastInsertId();
     }
 }
