@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ByteBuddyApi;
 
-use ByteBuddyApi\Factory\LoggerFactory;
-use ByteBuddyApi\Factory\PdoFactory;
+use ByteBuddyApi\V1\Factory\LoggerFactory;
+use ByteBuddyApi\V1\Factory\PdoFactory;
 use DI\Definition\Source\DefinitionArray;
 use Exception;
 use Monolog\Logger;
