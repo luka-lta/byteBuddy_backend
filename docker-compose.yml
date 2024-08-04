@@ -45,6 +45,8 @@ services:
     volumes:
       - byteBuddyData:/var/lib/mysql:rw
       - ./data/mysql:/docker-entrypoint-initdb.d/:ro
+    networks:
+      - byteBuddy-shared
 
   phpmyadmin:
     image: phpmyadmin
@@ -58,5 +60,25 @@ services:
     ports:
       - '8081:80'
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: 'grafana'
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - byteBuddy-shared
+    links:
+      - mysql
+
 volumes:
   byteBuddyData:
+  grafana_data:
+
+networks:
+  byteBuddy-shared:
+    driver: bridge
