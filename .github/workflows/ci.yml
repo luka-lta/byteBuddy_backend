@@ -19,7 +19,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build Docker Compose
-        run: docker-compose build
+        run: docker compose build
 
   code_style:
     runs-on: ubuntu-latest
@@ -30,11 +30,11 @@ jobs:
 
       - name: Run PHP CodeSniffer
         run: |
-          docker-compose run --rm php-fpm phpcs --standard=PSR12 src/
+          docker compose run --rm php-fpm phpcs --standard=PSR12 src/
 
       - name: Run PHP Mess Detector
         run: |
-          docker-compose run --rm php-fpm phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
+          docker compose run --rm php-fpm phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
 
   cleanup:
     runs-on: ubuntu-latest
@@ -44,4 +44,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Clean up
-        run: docker-compose down -v
+        run: docker compose down -v
