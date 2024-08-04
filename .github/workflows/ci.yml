@@ -30,11 +30,11 @@ jobs:
 
       - name: Run PHP CodeSniffer
         run: |
-          docker compose run --rm php-fpm phpcs --standard=PSR12 src/
+          docker compose run --rm php-fpm /app/vendor/bin/phpcs --standard=PSR12 src/
 
       - name: Run PHP Mess Detector
         run: |
-          docker compose run --rm php-fpm phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
+          docker compose run --rm php-fpm /app/vendor/bin/phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
 
   cleanup:
     runs-on: ubuntu-latest
